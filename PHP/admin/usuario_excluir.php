@@ -8,8 +8,50 @@
 	}
 
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
+	$id_tecnico = isset($_GET["id_tecnico"]) ? (int) $_GET["id_tecnico"] : 0;
+	$origem = isset($_GET["origem"]) && $_GET["origem"] === "tecnicos" ? "tecnicos.php" : "usuarios.php";
 
-	if ($id > 0 && $id !== (int) ($sessao["id"] ?? 0)) {
+	if ($id_tecnico > 0) {
+		try {
+			$conexao->beginTransaction();
+
+			$stmtTec = $conexao->prepare("SELECT nome, email FROM tecnicos WHERE id_tecnico = ?");
+			$stmtTec->execute([$id_tecnico]);
+			$tec = $stmtTec->fetch();
+			$nomeTec = $tec["nome"] ?? "Técnico #" . $id_tecnico;
+
+			$stmtUnsetTec = $conexao->prepare("UPDATE ordens_servico SET id_tecnico = NULL WHERE id_tecnico = ?");
+			$stmtUnsetTec->execute([$id_tecnico]);
+
+			$stmtDelTec = $conexao->prepare("DELETE FROM tecnicos WHERE id_tecnico = ?");
+			$stmtDelTec->execute([$id_tecnico]);
+
+			if (!empty($tec["email"])) {
+				$stmtC = $conexao->prepare("SELECT id_cliente FROM clientes WHERE LOWER(email) = ?");
+				$stmtC->execute([strtolower($tec["email"])]);
+				$idCli = (int) ($stmtC->fetchColumn() ?: 0);
+				if ($idCli > 0 && $idCli !== (int) ($sessao["id"] ?? 0)) {
+					$stmtDelEquip = $conexao->prepare("DELETE FROM equipamentos WHERE id_cliente = ?");
+					$stmtDelEquip->execute([$idCli]);
+
+					$stmtDelCli = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
+					$stmtDelCli->execute([$idCli]);
+				}
+			}
+
+			registrarAuditoria($conexao, "EXCLUSAO", "tecnicos", $id_tecnico, "Gerente excluiu o técnico " . $nomeTec . ".");
+
+			$conexao->commit();
+			$_SESSION["alerta_tipo"] = "exclusao";
+			$_SESSION["alerta_mensagem"] = "Técnico " . $nomeTec . " excluído com sucesso.";
+		} catch (Exception $e) {
+			if ($conexao->inTransaction()) {
+				$conexao->rollBack();
+			}
+			$_SESSION["alerta_tipo"] = "erro";
+			$_SESSION["alerta_mensagem"] = "Erro ao excluir o técnico: " . $e->getMessage();
+		}
+	} else if ($id > 0 && $id !== (int) ($sessao["id"] ?? 0)) {
 		try {
 			$conexao->beginTransaction();
 
@@ -71,6 +113,6 @@
 		$_SESSION["alerta_mensagem"] = "Não é permitido excluir o usuário que está logado atualmente.";
 	}
 
-	header("Location: usuarios.php");
+	header("Location: " . $origem);
 	exit;
 ?>

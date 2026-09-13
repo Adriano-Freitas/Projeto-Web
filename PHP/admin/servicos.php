@@ -10,7 +10,7 @@
 	$resultado = $conexao->query(
 		"SELECT s.id_servico AS id, s.nome, s.valor_base, s.status
 		 FROM servicos s
-		 ORDER BY s.nome"
+		 ORDER BY s.id_servico DESC"
 	);
 ?>
 	<h2>Gestão do Catálogo de Serviços</h2>
@@ -19,9 +19,10 @@
 		<p><a href="servico_form.php" class="botao">+ Novo Serviço</a></p>
 
 		<table class="tabela-admin">
-			<tr><th>Nome</th><th>Valor Base</th><th>Status</th><th>Ações</th></tr>
+			<tr><th>#</th><th>Nome</th><th>Valor Base</th><th>Status</th><th>Ações</th></tr>
 			<?php while ($linha = $resultado->fetch()) { ?>
 				<tr>
+					<td>#<?php echo $linha["id"]; ?></td>
 					<td><?php echo htmlspecialchars($linha["nome"]); ?></td>
 					<td>R$ <?php echo number_format($linha["valor_base"], 2, ",", "."); ?></td>
 					<td><?php echo htmlspecialchars($linha["status"]); ?></td>

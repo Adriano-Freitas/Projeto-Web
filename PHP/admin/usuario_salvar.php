@@ -55,6 +55,10 @@
 		$especialidade = "Manutenção Geral";
 	}
 
+	$statusInput = isset($_POST["status"]) ? trim(strtolower($_POST["status"])) : "ativo";
+	$status = ($statusInput === "inativo") ? "Inativo" : "Ativo";
+	$statusTecnico = strtolower($status);
+
 	try {
 		if ($id > 0) {
 			$stmtAntigo = $conexao->prepare("SELECT email FROM clientes WHERE id_cliente = ?");
@@ -63,11 +67,11 @@
 
 			if (!empty($senha)) {
 				$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=?, senha=? WHERE id_cliente=?");
-				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $senha_hash, $id]);
+				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=?, status=?, senha=? WHERE id_cliente=?");
+				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $status, $senha_hash, $id]);
 			} else {
-				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=? WHERE id_cliente=?");
-				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $id]);
+				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=?, status=? WHERE id_cliente=?");
+				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $status, $id]);
 			}
 
 			if ($tipo === "tecnico") {
@@ -75,11 +79,19 @@
 				$stmtTec->execute([strtolower($emailAntigo), strtolower($email)]);
 				$idTec = $stmtTec->fetchColumn();
 				if ($idTec) {
-					$stmtUpTec = $conexao->prepare("UPDATE tecnicos SET nome=?, email=?, telefone=?, especialidade=? WHERE id_tecnico=?");
-					$stmtUpTec->execute([$nome, $email, $telefone, $especialidade, $idTec]);
+					$stmtUpTec = $conexao->prepare("UPDATE tecnicos SET nome=?, email=?, telefone=?, especialidade=?, status=? WHERE id_tecnico=?");
+					$stmtUpTec->execute([$nome, $email, $telefone, $especialidade, $statusTecnico, $idTec]);
 				} else {
-					$stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, ?, 'ativo')");
-					$stmtInsTec->execute([$nome, $email, $telefone, $especialidade]);
+					$stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, ?, ?)");
+					$stmtInsTec->execute([$nome, $email, $telefone, $especialidade, $statusTecnico]);
+				}
+			} else {
+				$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE LOWER(email) = ? OR LOWER(email) = ?");
+				$stmtTec->execute([strtolower($emailAntigo), strtolower($email)]);
+				$idTec = $stmtTec->fetchColumn();
+				if ($idTec) {
+					$stmtUpTec = $conexao->prepare("UPDATE tecnicos SET status = 'inativo' WHERE id_tecnico = ?");
+					$stmtUpTec->execute([$idTec]);
 				}
 			}
 
@@ -88,21 +100,22 @@
 			$_SESSION["alerta_mensagem"] = "Usuário " . $nome . " atualizado com sucesso.";
 		} else {
 			$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-			$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, especialidade, senha) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id_cliente");
-			$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $senha_hash]);
+			$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, especialidade, status, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id_cliente");
+			$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $status, $senha_hash]);
 			$novoId = $stmt->fetchColumn();
 
 			if ($tipo === "tecnico") {
-				$stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, ?, 'ativo')");
-				$stmtInsTec->execute([$nome, $email, $telefone, $especialidade]);
+				$stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, ?, ?)");
+				$stmtInsTec->execute([$nome, $email, $telefone, $especialidade, $statusTecnico]);
 			}
 
-			registrarAuditoria($conexao, "CADASTRO", "clientes", $novoId, "Gerente cadastrou novo cliente: " . $nome . ".");
+			registrarAuditoria($conexao, "CADASTRO", "clientes", $novoId, "Gerente cadastrou novo usuário: " . $nome . ".");
 			$_SESSION["alerta_tipo"] = "sucesso";
 			$_SESSION["alerta_mensagem"] = "Usuário " . $nome . " cadastrado com sucesso.";
 		}
 
-		header("Location: usuarios.php");
+		$origem = isset($_POST["origem"]) && $_POST["origem"] === "tecnicos" ? "tecnicos.php" : "usuarios.php";
+		header("Location: " . $origem);
 		exit;
 	} catch (Exception $e) {
 		$_SESSION["alerta_tipo"] = "erro";

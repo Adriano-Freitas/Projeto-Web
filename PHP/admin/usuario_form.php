@@ -8,10 +8,17 @@
 	}
 
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
-	$clientes = array("id" => 0, "nome" => "", "email" => "", "telefone" => "", "cpf" => "", "tipo" => "cliente", "especialidade" => "", "status" => "Ativo");
+	$id_tecnico = isset($_GET["id_tecnico"]) ? (int) $_GET["id_tecnico"] : 0;
+	$tipoPadrao = isset($_GET["tipo"]) ? trim(strtolower($_GET["tipo"])) : "cliente";
+	if (!in_array($tipoPadrao, array("cliente", "tecnico", "gerente"))) {
+		$tipoPadrao = "cliente";
+	}
+	$origem = isset($_GET["origem"]) && $_GET["origem"] === "tecnicos" ? "tecnicos" : "usuarios";
+
+	$clientes = array("id" => 0, "nome" => "", "email" => "", "telefone" => "", "cpf" => "", "tipo" => $tipoPadrao, "especialidade" => "", "status" => "Ativo");
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo, especialidade FROM clientes WHERE id_cliente = ?");
+		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo, especialidade, COALESCE(status, 'Ativo') AS status FROM clientes WHERE id_cliente = ?");
 		$stmt->execute([$id]);
 		$dado = $stmt->fetch();
 		if ($dado) {
@@ -22,13 +29,35 @@
 				$clientes["especialidade"] = $stmtTec->fetchColumn() ?: "";
 			}
 		}
+	} elseif ($id_tecnico > 0) {
+		$origem = "tecnicos";
+		$stmtTec = $conexao->prepare("SELECT id_tecnico, nome, email, telefone, especialidade, status FROM tecnicos WHERE id_tecnico = ?");
+		$stmtTec->execute([$id_tecnico]);
+		$dadoTec = $stmtTec->fetch();
+		if ($dadoTec) {
+			$stmtC = $conexao->prepare("SELECT id_cliente AS id, cpf, endereco FROM clientes WHERE LOWER(email) = ?");
+			$stmtC->execute([strtolower($dadoTec["email"])]);
+			$dadoC = $stmtC->fetch();
+			$clientes["id"] = $dadoC ? (int) $dadoC["id"] : 0;
+			$clientes["nome"] = $dadoTec["nome"];
+			$clientes["email"] = $dadoTec["email"];
+			$clientes["telefone"] = $dadoTec["telefone"];
+			$clientes["cpf"] = $dadoC["cpf"] ?? "";
+			$clientes["tipo"] = "tecnico";
+			$clientes["especialidade"] = $dadoTec["especialidade"];
+			$clientes["status"] = ucfirst(strtolower($dadoTec["status"] ?? "Ativo"));
+		}
 	}
+	$isEdicao = ($clientes["id"] > 0 || $id_tecnico > 0);
+	$tituloForm = $isEdicao ? ($clientes["tipo"] === "tecnico" ? "Editar Técnico" : "Editar Usuário") : ($clientes["tipo"] === "tecnico" ? "Novo Técnico" : "Novo Usuário");
+	$linkCancelar = $origem === "tecnicos" ? "tecnicos.php" : "usuarios.php";
 ?>
-	<h2><?php echo $id > 0 ? "Editar Usuário" : "Novo Usuário"; ?></h2>
+	<h2><?php echo htmlspecialchars($tituloForm); ?></h2>
 
 	<div class="justificar cartao" style="max-width: 500px;">
 		<form method="post" action="usuario_salvar.php">
 			<input type="hidden" name="id" value="<?php echo (int) $clientes["id"]; ?>">
+			<input type="hidden" name="origem" value="<?php echo htmlspecialchars($origem); ?>">
 
 			<label><b>Nome:</b></label><br>
 			<input type="text" name="nome" required value="<?php echo htmlspecialchars($clientes["nome"]); ?>"><br>
@@ -56,15 +85,15 @@
 
 			<label><b>Status:</b></label><br>
 			<select name="status">
-				<option value="Ativo" <?php echo $clientes["status"] === "Ativo" ? "selected" : ""; ?>>Ativo</option>
-				<option value="Inativo" <?php echo $clientes["status"] === "Inativo" ? "selected" : ""; ?>>Inativo</option>
+				<option value="Ativo" <?php echo strtolower($clientes["status"]) === "ativo" ? "selected" : ""; ?>>Ativo</option>
+				<option value="Inativo" <?php echo strtolower($clientes["status"]) === "inativo" ? "selected" : ""; ?>>Inativo</option>
 			</select><br>
 
-			<label><b><?php echo $id > 0 ? "Nova Senha (deixe em branco para manter)" : "Senha"; ?>:</b></label><br>
-			<input type="password" name="senha" <?php echo $id > 0 ? "" : "required"; ?>><br>
+			<label><b><?php echo $isEdicao ? "Nova Senha (deixe em branco para manter)" : "Senha"; ?>:</b></label><br>
+			<input type="password" name="senha" <?php echo $isEdicao ? "" : "required"; ?>><br>
 
 			<button type="submit" class="botao">Salvar</button>
-			<a href="usuarios.php" class="botao secundario">Cancelar</a>
+			<a href="<?php echo htmlspecialchars($linkCancelar); ?>" class="botao secundario">Cancelar</a>
 		</form>
 	</div>
 

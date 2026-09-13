@@ -63,7 +63,7 @@
 		 LEFT JOIN ordem_servico_servicos oss ON oss.id_ordem = o.id_ordem
 		 LEFT JOIN servicos s ON s.id_servico = oss.id_servico
 		 LEFT JOIN pagamentos p ON p.id_ordem = o.id_ordem
-		 ORDER BY o.data_abertura DESC"
+		 ORDER BY o.id_ordem DESC, o.data_abertura DESC"
 	);
 ?>
 	<h2>Ordens de Serviço</h2>

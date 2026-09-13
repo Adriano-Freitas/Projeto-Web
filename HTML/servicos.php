@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../PHP/includes/header.php';
 try {
-    $stmt=$pdo->query("SELECT s.id_servico AS id, s.nome AS titulo, s.descricao, s.valor_base AS preco_base FROM servicos s WHERE LOWER(s.status)='ativo' ORDER BY s.nome");
+    $stmt=$pdo->query("SELECT s.id_servico AS id, s.nome AS titulo, s.descricao, s.valor_base AS preco_base FROM servicos s WHERE LOWER(s.status)='ativo' ORDER BY s.id_servico DESC");
     $servicos=$stmt->fetchAll();
 } catch (Exception $e) {
     $servicos=[];

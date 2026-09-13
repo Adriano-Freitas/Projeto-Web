@@ -26,7 +26,7 @@ $stmt = $conexao->prepare(
      LEFT JOIN servicos s ON s.id_servico = oss.id_servico
      LEFT JOIN pagamentos p ON p.id_ordem = o.id_ordem
      WHERE o.id_cliente = ?
-     ORDER BY o.data_abertura DESC"
+     ORDER BY o.id_ordem DESC, o.data_abertura DESC"
 );
 $stmt->execute([$id_cliente]);
 
