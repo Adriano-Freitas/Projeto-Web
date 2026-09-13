@@ -32,10 +32,10 @@
 			<input type="email" name="email" required value="<?php echo htmlspecialchars($clientes["email"]); ?>"><br>
 
 			<label><b>Telefone:</b></label><br>
-			<input type="text" name="telefone" required value="<?php echo htmlspecialchars($clientes["telefone"]); ?>"><br>
+			<input type="text" name="telefone" id="telefone" maxlength="15" required value="<?php echo htmlspecialchars($clientes["telefone"]); ?>" placeholder="(00) 00000-0000"><br>
 
 			<label><b>CPF:</b></label><br>
-			<input type="text" name="cpf" required value="<?php echo htmlspecialchars($clientes["cpf"]); ?>"><br>
+			<input type="text" name="cpf" id="cpf" maxlength="14" required value="<?php echo htmlspecialchars($clientes["cpf"]); ?>" placeholder="000.000.000-00"><br>
 
 			<label><b>Tipo:</b></label><br>
 			<select name="tipo" required>
@@ -60,6 +60,55 @@
 			<a href="usuarios.php" class="botao secundario">Cancelar</a>
 		</form>
 	</div>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var telInput = document.getElementById("telefone");
+			var cpfInput = document.getElementById("cpf");
+
+			function aplicarMascaraTelefone(v) {
+				v = v.replace(/\D/g, "");
+				if (v.length > 11) v = v.substring(0, 11);
+				if (v.length > 10) {
+					return "(" + v.substring(0, 2) + ") " + v.substring(2, 7) + "-" + v.substring(7, 11);
+				} else if (v.length > 6) {
+					return "(" + v.substring(0, 2) + ") " + v.substring(2, 6) + "-" + v.substring(6, 10);
+				} else if (v.length > 2) {
+					return "(" + v.substring(0, 2) + ") " + v.substring(2);
+				} else if (v.length > 0) {
+					return "(" + v;
+				}
+				return "";
+			}
+
+			function aplicarMascaraCPF(v) {
+				v = v.replace(/\D/g, "");
+				if (v.length > 11) v = v.substring(0, 11);
+				if (v.length > 9) {
+					return v.substring(0, 3) + "." + v.substring(3, 6) + "." + v.substring(6, 9) + "-" + v.substring(9, 11);
+				} else if (v.length > 6) {
+					return v.substring(0, 3) + "." + v.substring(3, 6) + "." + v.substring(6);
+				} else if (v.length > 3) {
+					return v.substring(0, 3) + "." + v.substring(3);
+				}
+				return v;
+			}
+
+			if (telInput) {
+				telInput.value = aplicarMascaraTelefone(telInput.value);
+				telInput.addEventListener("input", function() {
+					this.value = aplicarMascaraTelefone(this.value);
+				});
+			}
+
+			if (cpfInput) {
+				cpfInput.value = aplicarMascaraCPF(cpfInput.value);
+				cpfInput.addEventListener("input", function() {
+					this.value = aplicarMascaraCPF(this.value);
+				});
+			}
+		});
+	</script>
 <?php
 	include "footer.php";
 ?>
