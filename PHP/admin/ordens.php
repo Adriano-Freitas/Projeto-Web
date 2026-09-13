@@ -20,6 +20,24 @@
 			$stmt->execute([$novo_status, $id_ordem]);
 		}
 
+		if ($novo_status === "Concluído") {
+			$stmtPag = $conexao->prepare("SELECT id_pagamento FROM pagamentos WHERE id_ordem = ?");
+			$stmtPag->execute([$id_ordem]);
+			$pagExistente = $stmtPag->fetch();
+
+			if ($pagExistente) {
+				$stmtUpPag = $conexao->prepare("UPDATE pagamentos SET status = 'pago', data_pagamento = COALESCE(data_pagamento, NOW()) WHERE id_ordem = ?");
+				$stmtUpPag->execute([$id_ordem]);
+			} else {
+				$stmtValor = $conexao->prepare("SELECT valor_total FROM ordens_servico WHERE id_ordem = ?");
+				$stmtValor->execute([$id_ordem]);
+				$valorTotal = $stmtValor->fetchColumn() ?: 0.00;
+
+				$stmtInsPag = $conexao->prepare("INSERT INTO pagamentos (id_ordem, valor, metodo_pagamento, status, data_pagamento) VALUES (?, ?, 'dinheiro', 'pago', NOW())");
+				$stmtInsPag->execute([$id_ordem, $valorTotal]);
+			}
+		}
+
 		registrarAuditoria($conexao, "ATUALIZACAO_STATUS", "ordens_servico", $id_ordem, "Status atualizado para \"" . $novo_status . "\".");
 
 		header("Location: ordens.php");
