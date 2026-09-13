@@ -59,6 +59,13 @@
                 <label for="reg-confirmar-senha"><b>Confirmar Senha:</b></label><br>
                 <input type="password" id="reg-confirmar-senha" name="confirmar_senha" required placeholder="Repita a senha"><br>
 
+                <label for="reg-tipo"><b>Tipo de Usuário:</b></label><br>
+                <select id="reg-tipo" name="tipo" class="form-select" style="margin-bottom: 20px;">
+                    <option value="cliente" selected>Cliente (Padrão)</option>
+                    <option value="tecnico">Técnico (Assistência)</option>
+                    <option value="gerente">Gerente (Administrador)</option>
+                </select><br>
+
                 <p id="erro-registrar" class="erro"></p>
 
                 <button type="submit" class="botao">Criar Conta</button>
@@ -69,6 +76,9 @@
 
     <div id="area-dashboard" class="oculto">
         <h2>Bem-vindo de volta, <span id="dashboard-nome">[Nome do Cliente]</span>!</h2>
+        <div id="bloco-acesso-admin" class="oculto" style="margin-bottom: 20px; padding: 14px 18px; background-color: rgba(0, 229, 255, 0.08); border: 1px solid var(--primary-color); border-radius: 8px;">
+            <p style="margin: 0; color: var(--text-main);"><b>Perfil Administrativo:</b> Você possui acesso como <span id="dashboard-tipo" style="color: var(--primary-color); font-weight: bold; text-transform: uppercase;"></span>. <a href="../PHP/admin/index.php" style="margin-left: 12px; font-weight: 700; color: var(--primary-color); text-decoration: underline;">[Acessar Painel Gerencial / Técnico]</a></p>
+        </div>
         <p class="justificar">Aqui você tem controle total sobre os seus dados e os serviços solicitados na Fix it.</p>
 
         <div class="abas">

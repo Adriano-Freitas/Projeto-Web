@@ -5,7 +5,7 @@ header("Content-Type: application/json");
 $email = isset($_POST["email"]) ? trim($_POST["email"]) : "";
 $senha = isset($_POST["senha"]) ? $_POST["senha"] : "";
 
-$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha FROM clientes WHERE email = ?");
+$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE email = ?");
 $stmt->execute([$email]);
 
 $linha = $stmt->fetch();
@@ -28,7 +28,7 @@ $clientes = array(
     "email" => $linha["email"],
     "telefone" => $linha["telefone"] ?? "",
     "cpf" => $linha["cpf"] ?? "",
-    "tipo" => "cliente"
+    "tipo" => $linha["tipo"] ?? "cliente"
 );
 
 $_SESSION["clientes"] = $clientes;

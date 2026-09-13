@@ -204,6 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        var tipo = document.getElementById("reg-tipo") ? document.getElementById("reg-tipo").value : "cliente";
         var botaoEnviar = formRegistrar.querySelector("button[type='submit']");
         botaoEnviar.disabled = true;
 
@@ -213,7 +214,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 email: email,
                 telefone: telefone,
                 cpf: cpf,
-                senha: senha
+                senha: senha,
+                tipo: tipo
             });
 
             if (!resposta.sucesso) {
@@ -237,6 +239,17 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("ver-email").textContent = clientes.email;
         document.getElementById("ver-telefone").textContent = clientes.telefone;
         document.getElementById("ver-cpf").textContent = clientes.cpf;
+
+        var blocoAdmin = document.getElementById("bloco-acesso-admin");
+        var dashboardTipo = document.getElementById("dashboard-tipo");
+        if (blocoAdmin && dashboardTipo) {
+            if (clientes.tipo === "gerente" || clientes.tipo === "tecnico") {
+                dashboardTipo.textContent = clientes.tipo;
+                blocoAdmin.classList.remove("oculto");
+            } else {
+                blocoAdmin.classList.add("oculto");
+            }
+        }
 
         document.getElementById("perfil-nome").value = clientes.nome;
         document.getElementById("perfil-email").value = clientes.email;
