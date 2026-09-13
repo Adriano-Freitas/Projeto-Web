@@ -57,15 +57,18 @@
 			registrarAuditoria($conexao, "EXCLUSAO", "clientes", $id, "Gerente excluiu o usuário " . $nomeCliente . ".");
 
 			$conexao->commit();
-			$_SESSION["mensagem_sucesso"] = "Usuário " . $nomeCliente . " excluído com sucesso.";
+			$_SESSION["alerta_tipo"] = "exclusao";
+			$_SESSION["alerta_mensagem"] = "Usuário " . $nomeCliente . " excluído com sucesso.";
 		} catch (Exception $e) {
 			if ($conexao->inTransaction()) {
 				$conexao->rollBack();
 			}
-			$_SESSION["mensagem_erro"] = "Erro ao excluir o usuário: " . $e->getMessage();
+			$_SESSION["alerta_tipo"] = "erro";
+			$_SESSION["alerta_mensagem"] = "Erro ao excluir o usuário: " . $e->getMessage();
 		}
 	} else if ($id === (int) ($sessao["id"] ?? 0)) {
-		$_SESSION["mensagem_erro"] = "Não é permitido excluir o usuário que está logado atualmente.";
+		$_SESSION["alerta_tipo"] = "erro";
+		$_SESSION["alerta_mensagem"] = "Não é permitido excluir o usuário que está logado atualmente.";
 	}
 
 	header("Location: usuarios.php");

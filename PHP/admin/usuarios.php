@@ -11,17 +11,6 @@
 ?>
 	<h2>Gestão de Usuários</h2>
 
-	<?php if (!empty($_SESSION["mensagem_sucesso"])) { ?>
-		<p style="background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 4px;">
-			<?php echo htmlspecialchars($_SESSION["mensagem_sucesso"]); unset($_SESSION["mensagem_sucesso"]); ?>
-		</p>
-	<?php } ?>
-	<?php if (!empty($_SESSION["mensagem_erro"])) { ?>
-		<p style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 4px;">
-			<?php echo htmlspecialchars($_SESSION["mensagem_erro"]); unset($_SESSION["mensagem_erro"]); ?>
-		</p>
-	<?php } ?>
-
 	<div class="justificar">
 		<p><a href="usuario_form.php" class="botao">+ Novo Usuário</a></p>
 

@@ -40,6 +40,9 @@
 
 		registrarAuditoria($conexao, "ATUALIZACAO_STATUS", "ordens_servico", $id_ordem, "Status atualizado para \"" . $novo_status . "\".");
 
+		$_SESSION["alerta_tipo"] = "sucesso";
+		$_SESSION["alerta_mensagem"] = "Status da Ordem #" . $id_ordem . " atualizado para \"" . $novo_status . "\".";
+
 		header("Location: ordens.php");
 		exit;
 	}

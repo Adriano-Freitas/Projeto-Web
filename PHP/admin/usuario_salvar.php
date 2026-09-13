@@ -43,6 +43,8 @@
 		}
 
 		registrarAuditoria($conexao, "ATUALIZACAO", "clientes", $id, "Gerente atualizou o cadastro de " . $nome . ".");
+		$_SESSION["alerta_tipo"] = "sucesso";
+		$_SESSION["alerta_mensagem"] = "Usuário " . $nome . " atualizado com sucesso.";
 	} else {
 		$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 		$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, senha) VALUES (?, ?, ?, ?, ?, ?) RETURNING id_cliente");
@@ -50,6 +52,8 @@
 		$novoId = $stmt->fetchColumn();
 
 		registrarAuditoria($conexao, "CADASTRO", "clientes", $novoId, "Gerente cadastrou novo cliente: " . $nome . ".");
+		$_SESSION["alerta_tipo"] = "sucesso";
+		$_SESSION["alerta_mensagem"] = "Usuário " . $nome . " cadastrado com sucesso.";
 	}
 
 	header("Location: usuarios.php");
