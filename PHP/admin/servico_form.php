@@ -8,7 +8,7 @@
 	}
 
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
-	$servico = array("id" => 0, "id_categoria" => "", "nome" => "", "descricao" => "", "valor_base" => "0.00", "status" => "Ativo");
+	$servico = array("id" => 0, "nome" => "", "descricao" => "", "valor_base" => "0.00", "status" => "Ativo");
 
 	if ($id > 0) {
 		$stmt = $conexao->prepare("SELECT id_servico AS id, nome, descricao, valor_base, status FROM servicos WHERE id_servico = ?");
@@ -27,11 +27,6 @@
 
 			<label><b>Nome:</b></label><br>
 			<input type="text" name="nome" required value="<?php echo htmlspecialchars($servico["nome"]); ?>"><br>
-
-			<label><b>Categoria:</b></label><br>
-			<select name="id_categoria">
-				<option value="1">Geral</option>
-			</select><br>
 
 			<label><b>Descrição:</b></label><br>
 			<textarea name="descricao" rows="4"><?php echo htmlspecialchars($servico["descricao"]); ?></textarea><br>

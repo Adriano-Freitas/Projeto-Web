@@ -22,8 +22,7 @@
 		<p>
 			<?php if ($clientesLogado["tipo"] === "gerente") { ?>
 				<a href="usuarios.php">Usuários</a>
-				<a href="categorias.php">Categorias</a>
-				<a href="servicos.php">Serviços/Artigos</a>
+				<a href="servicos.php">Serviços</a>
 			<?php } ?>
 			<a href="ordens.php">Ordens de Serviço</a>
 			<a href="../../HTML/index.html">Ver Site</a>

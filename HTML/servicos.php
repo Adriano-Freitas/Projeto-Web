@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../PHP/includes/header.php';
 try {
-    $stmt=$pdo->query("SELECT s.id_servico AS id, s.nome AS titulo, s.descricao, s.valor_base AS preco_base, 'Geral' AS categoria FROM servicos s WHERE LOWER(s.status)='ativo' ORDER BY s.nome");
+    $stmt=$pdo->query("SELECT s.id_servico AS id, s.nome AS titulo, s.descricao, s.valor_base AS preco_base FROM servicos s WHERE LOWER(s.status)='ativo' ORDER BY s.nome");
     $servicos=$stmt->fetchAll();
 } catch (Exception $e) {
     $servicos=[];
@@ -12,7 +12,6 @@ try {
 <div id="lista-servicos" class="grid">
 <?php foreach($servicos as $s): ?>
 <article class="card" data-nome="<?=e($s['titulo'])?>" data-preco="<?=$s['preco_base']?>">
- <span class="badge"><?=e($s['categoria'])?></span>
  <h2><?=e($s['titulo'])?></h2><p><?=e($s['descricao'])?></p>
  <a class="btn" href="servicos.html">Ver detalhes</a>
 </article>

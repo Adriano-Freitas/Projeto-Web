@@ -5,8 +5,7 @@
     <nav>
       <a href="index.php">Painel</a>
       <a href="clientes.php">Usuários</a>
-      <a href="categorias.php">Categorias</a>
-      <a href="artigos.php">Serviços</a>
+      <a href="servicos.php">Serviços</a>
       <a href="ordens.php">Ordens</a>
       <a href="../logout.php">Sair</a>
     </nav>

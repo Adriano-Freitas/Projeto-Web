@@ -79,7 +79,7 @@ Credenciais para testes iniciais:
 - Paginas Inicial, Sobre, Servicos (lista geral), detalhe individual e Contatos.
 - Formulario de contato com envio de e-mail via SMTP autenticado (Brevo) com suporte a TLS e fallback.
 - Area do cliente com cadastro, login por sessao e acompanhamento de ordens.
-- CMS com CRUD de Usuarios, Servicos/Artigos e Categorias.
+- CMS com CRUD de Usuarios e Catalogo de Servicos.
 - Upload e redimensionamento de imagens com biblioteca GD.
 - Controle de ordens, tecnicos, orcamento, fatura e pagamento.
 - Auditoria de operacoes do sistema.
