@@ -1,0 +1,290 @@
+body {
+    background-color: #121214;
+    color: #e0e0e0;
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h5 {
+    color: #bfa071;
+}
+
+h2 {
+    border-top: 1px solid;
+    padding-top: 5px;
+    border-bottom: 1px solid;
+    padding-bottom: 5px;
+}
+
+pre {
+    background-color: #1a1a1e;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 0.9em;
+}
+
+h5 {
+    border-top: 1px solid;
+    padding-top: 15px;
+}
+
+a {
+    color: #b080c0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.centralizar {
+    text-align: center;
+}
+
+.justificar {
+    text-align: justify;
+}
+
+img {
+    display: block;
+    margin: 20px auto;
+    max-width: 100%;
+    height: auto;
+}
+
+.livro-imagem { 
+    width: 250px; 
+}
+
+.gif { 
+    width: 500px; 
+}
+
+.lista li {
+    margin-bottom: 15px;
+}
+
+footer {
+    text-align: center;
+    color: #888;
+    margin-top: 40px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    background-color: #1a1a1e;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    border-radius: 4px;
+}
+
+.form-select.pagamento {
+    margin-bottom: 20px;
+}
+
+.btn-enviar {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #bfa071;
+    color: #121214;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.btn-enviar:hover {
+    background-color: #d8b98a;
+}
+
+.oculto {
+    display: none !important;
+}
+
+.abas {
+    display: flex;
+    gap: 5px;
+    margin-top: 20px;
+    border-bottom: 1px solid #333;
+}
+
+.aba {
+    flex: 1;
+    background-color: transparent;
+    color: #999;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.aba:hover {
+    color: #e0e0e0;
+}
+
+.aba.ativa {
+    color: #bfa071;
+    border-bottom: 3px solid #bfa071;
+    font-weight: bold;
+}
+
+.cartao {
+    background-color: #1a1a1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.cartao input,
+.cartao select,
+.cartao textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: #121214;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    border-radius: 4px;
+}
+
+.botao {
+    background-color: #bfa071;
+    color: #121214;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.botao:hover {
+    background-color: #d8b98a;
+}
+
+.botao.secundario {
+    background-color: transparent;
+    color: #e0e0e0;
+    border: 1px solid #666;
+}
+
+.botao.secundario:hover {
+    background-color: #2a2a2e;
+}
+
+.botao.perigo {
+    background-color: transparent;
+    color: #e07a7a;
+    border: 1px solid #e07a7a;
+    margin-top: 30px;
+}
+
+.botao.perigo:hover {
+    background-color: #2a1a1a;
+}
+
+.dica {
+    font-size: 0.9em;
+    color: #999;
+    margin-top: 10px;
+}
+
+.erro {
+    color: #e07a7a;
+    font-weight: bold;
+}
+
+.sucesso {
+    color: #8fd19e;
+    font-weight: bold;
+}
+
+.servico-cliente {
+    background-color: #121214;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-andamento {
+    background-color: #4a3b1f;
+    color: #d8b98a;
+}
+
+.status-concluido {
+    background-color: #1f3b2a;
+    color: #8fd19e;
+}
+
+.status-pendente {
+    background-color: #4a1f1f;
+    color: #e07a7a;
+}
+
+.botao-pagar {
+    background-color: #bfa071;
+    color: #121214;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.botao-pagar:hover {
+    background-color: #d8b98a;
+}
+
+.tabela-admin {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabela-admin th,
+.tabela-admin td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid #333;
+}
+
+.tabela-admin th {
+    color: #bfa071;
+    background-color: #1a1a1e;
+}
+
+.tabela-admin tr:hover {
+    background-color: #1a1a1e;
+}
+
+.tabela-admin select {
+    background-color: #1a1a1e;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 4px;
+}

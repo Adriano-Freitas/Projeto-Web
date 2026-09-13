@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Manutenção - Fix it</title>
+    <link rel="stylesheet" href="../../CSS/documento.css">
+    <script src="https://unpkg.com/imask" defer></script>
+    <script src="../../JS/solicitacaoServico.js" defer></script>
+</head>
+<body>
+    <div class="centralizar">
+        <h1>Fix it: Assistência técnica</h1>
+        <p><a href="../index.html">[Início]</a> <a href="../sobre.html">[Sobre]</a> <a href="../servicos.html">[Serviços]</a> <a href="../contatos.html">[Contatos]</a> <a href="../conta.html">[Área cliente]</a></p>
+    </div>
+
+    <h2>Manutenção Especializada</h2>
+    
+    <div class="justificar">
+        <p>Realizamos diagnósticos técnicos precisos, troca de componentes danificados e o conserto completo de falhas físicas ou lógicas no seu equipamento, garantindo segurança e alto desempenho.</p>
+    </div>
+
+    <h3>Solicitar Serviço</h3>
+    
+    <div class="justificar">
+        <form id="form-solicitacao" data-servico-id="1" action="../../PHP/solicitar_servico.php" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id_servico" value="1">
+
+            <label><b>Tipo de Aparelho:</b></label><br>
+            <select id="tipo-aparelho" name="tipo_aparelho" class="form-select" required>
+                <option value="">Selecione o aparelho...</option>
+                <option value="computador">Computador</option>
+                <option value="notebook">Notebook</option>
+                <option value="celular">Celular</option>
+            </select><br>
+
+            <label><b>Qual o problema do aparelho?</b></label><br>
+            <textarea id="problema-aparelho" name="problema_aparelho" rows="5" class="form-textarea" required placeholder="Descreva detalhadamente o defeito ou comportamento do aparelho..."></textarea><br>
+
+            <p class="dica">A retirada e a entrega do equipamento acontecem presencialmente em nossa loja (veja o endereço na página <a href="../contatos.html">Contatos</a>). Não realizamos coleta/entrega no endereço do cliente.</p><br>
+
+            <label><b>Tipo de Pagamento:</b></label><br>
+            <select id="tipo-pagamento" name="tipo_pagamento" class="form-select pagamento" required>
+                <option value="">Selecione a forma de pagamento...</option>
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">PIX</option>
+                <option value="cartao_credito">Cartão de Crédito</option>
+                <option value="cartao_debito">Cartão de Débito</option>
+            </select><br>
+
+            <label>Imagens do aparelho (opcional):</label><br>
+            <input type="file" name="imagens[]" class="form-input" accept="image/*" multiple><br><br>
+
+            <button type="submit" class="btn-enviar">Enviar Solicitação</button>
+        </form>
+    </div>
+
+    <footer>
+        <h5>Todos os direitos reservados &copy;</h5>
+    </footer>
+</body>
+</html>

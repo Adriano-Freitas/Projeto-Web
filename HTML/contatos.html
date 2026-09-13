@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Contatos - Fix it</title>
+    <link rel="stylesheet" href="../CSS/documento.css">
+</head>
+<body>
+    <div class="centralizar">
+        <h1>Fix it: Assistência técnica</h1>
+        <p><a href="./index.html">[Início]</a> <a href="./sobre.html">[Sobre]</a> <a href="./servicos.html">[Serviços]</a> [Contatos] <a href="./conta.html">[Área cliente]</a></p>
+    </div>
+
+    <h2>Entre em Contato Conosco</h2>
+
+    <div class="justificar">
+        <p>Precisa tirar dúvidas, solicitar um orçamento ou falar sobre o seu equipamento? Escolha o canal de sua preferência abaixo. Nossa equipe está sempre pronta para atender você com agilidade e eficiência.</p>
+    </div>
+
+    <h3>Nossa Loja Física</h3>
+    <div class="justificar">
+        <p>
+            <b>Endereço:</b> Rua da Tecnologia, nº 123 - Sala 402<br>
+            Bairro: Centro Comercial - Cidade/SP<br>
+            <i>Horário de funcionamento: Segunda a Sexta, das 08h às 18h | Sábados, das 08h às 13h.</i>
+        </p>
+    </div>
+
+    <h3>Canais de Comunicação</h3>
+    <div class="justificar">
+        <ul class="lista">
+            <li><b>WhatsApp:</b> <a href="https://wa.me/" target="_blank">(00) 90000-0000</a> – <i>Atendimento rápido para dúvidas e orçamentos direto pelo celular.</i></li>
+            <li><b>Telegram:</b> <a href="https://t.me/" target="_blank">@fixit_suporte</a> – <i>Canal direto para suporte técnico e acompanhamento ágil.</i></li>
+            <li><b>Instagram:</b> <a href="https://instagram.com/fixit_assistencia" target="_blank">@fixit_assistencia</a> – <i>Siga para acompanhar nosso dia a dia, dicas de manutenção e novidades.</i></li>
+            <li><b>E-mail:</b> <a href="mailto:contato@fixit.com">contato@fixit.com</a> – <i>Para mensagens detalhadas, parcerias e solicitações formais.</i></li>
+        </ul>
+    </div>
+
+    <h3>Fale Conosco pelo Formulário</h3>
+    <div class="justificar cartao">
+        <form id="form-contato" action="../PHP/enviar_contato.php" method="post">
+            <label for="contato-nome"><b>Nome:</b></label><br>
+            <input type="text" id="contato-nome" name="nome" class="form-input" required placeholder="Seu nome completo"><br>
+
+            <label for="contato-email"><b>E-mail:</b></label><br>
+            <input type="email" id="contato-email" name="email" class="form-input" required placeholder="seuemail@exemplo.com"><br>
+
+            <label for="contato-assunto"><b>Assunto:</b></label><br>
+            <input type="text" id="contato-assunto" name="assunto" class="form-input" required placeholder="Sobre o que você quer falar?"><br>
+
+            <label for="contato-mensagem"><b>Mensagem:</b></label><br>
+            <textarea id="contato-mensagem" name="mensagem" rows="5" class="form-textarea" required placeholder="Escreva sua mensagem..."></textarea><br>
+
+            <button type="submit" class="btn-enviar">Enviar Mensagem</button>
+        </form>
+    </div>
+
+    <footer>
+        <h5>Todos os direitos reservados &copy;</h5>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Montagem - Fix it</title>
+    <link rel="stylesheet" href="../../CSS/documento.css">
+    <script src="https://unpkg.com/imask" defer></script>
+    <script src="../../JS/solicitacaoServico.js" defer></script>
+</head>
+<body>
+    <div class="centralizar">
+        <h1>Fix it: Assistência técnica</h1>
+        <p><a href="../index.html">[Início]</a> <a href="../sobre.html">[Sobre]</a> <a href="../servicos.html">[Serviços]</a> <a href="../contatos.html">[Contatos]</a> <a href="../conta.html">[Área cliente]</a></p>
+    </div>
+
+    <h2>Montagem de Computadores</h2>
+    
+    <div class="justificar">
+        <p>Montagem profissional de computadores voltados para jogos (PCs Gamer), uso corporativo ou estações de trabalho de alto desempenho. Inclui organização avançada de cabos e testes de estresse.</p>
+    </div>
+
+    <h3>Solicitar Serviço</h3>
+    
+    <div class="justificar">
+        <form id="form-solicitacao" data-servico-id="3" action="../../PHP/solicitar_servico.php" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id_servico" value="3">
+
+            <p><b>Informe abaixo as peças que serão fornecidas por você para a montagem:</b></p>
+            
+            <label>Processador (CPU):</label><br>
+            <input type="text" id="processador" name="processador" class="form-input" placeholder="Ex: Intel Core i5 / AMD Ryzen 5"><br>
+
+            <label>Placa-Mãe:</label><br>
+            <input type="text" id="placa-mae" name="placa_mae" class="form-input" placeholder="Ex: ASUS Prime H610M"><br>
+
+            <label>Memória RAM:</label><br>
+            <input type="text" id="memoria-ram" name="memoria_ram" class="form-input" placeholder="Ex: 16GB DDR4 3200MHz"><br>
+
+            <label>Placa de Vídeo (GPU):</label><br>
+            <input type="text" id="placa-video" name="placa_video" class="form-input" placeholder="Ex: RTX 3060 (ou Nenhuma)"><br>
+
+            <label>Armazenamento (SSD / HD):</label><br>
+            <input type="text" id="armazenamento" name="armazenamento" class="form-input" placeholder="Ex: SSD NVMe 500GB"><br>
+
+            <label>Fonte de Alimentação:</label><br>
+            <input type="text" id="fonte" name="fonte" class="form-input" placeholder="Ex: 600W 80 Plus Bronze"><br>
+
+            <label>Gabinete:</label><br>
+            <input type="text" id="gabinete" name="gabinete" class="form-input" placeholder="Ex: Gamer Mid Tower com fans"><br>
+
+            <p class="dica">A retirada e a entrega do equipamento acontecem presencialmente em nossa loja (veja o endereço na página <a href="../contatos.html">Contatos</a>). Não realizamos coleta/entrega no endereço do cliente.</p><br>
+
+            <label><b>Tipo de Pagamento:</b></label><br>
+            <select id="tipo-pagamento" name="tipo_pagamento" class="form-select pagamento" required>
+                <option value="">Selecione a forma de pagamento...</option>
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">PIX</option>
+                <option value="cartao_credito">Cartão de Crédito</option>
+                <option value="cartao_debito">Cartão de Débito</option>
+            </select><br>
+
+            <label>Imagens das peças (opcional):</label><br>
+            <input type="file" name="imagens[]" class="form-input" accept="image/*" multiple><br><br>
+
+            <button type="submit" class="btn-enviar">Enviar Solicitação</button>
+        </form>
+    </div>
+
+    <footer>
+        <h5>Todos os direitos reservados &copy;</h5>
+    </footer>
+</body>
+</html>

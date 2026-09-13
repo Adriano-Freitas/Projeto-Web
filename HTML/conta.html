@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Área do Cliente - Fix it</title>
+    <link rel="stylesheet" href="../CSS/documento.css">
+    <script src="https://unpkg.com/imask" defer></script>
+    <script type="text/javascript" src="../JS/conta.js" defer></script>
+</head>
+<body>
+    <div class="centralizar">
+        <h1>Fix it: Assistência técnica</h1>
+        <p><a href="./index.html">[Início]</a> <a href="./sobre.html">[Sobre]</a> <a href="./servicos.html">[Serviços]</a> <a href="./contatos.html">[Contatos]</a> [Área cliente]</p>
+    </div>
+
+    <div id="area-visitante">
+        <h2>Área do Cliente</h2>
+        <p class="justificar">Acesse sua conta para gerenciar seus serviços ou registre-se caso seja seu primeiro atendimento conosco.</p>
+
+        <div class="abas">
+            <button type="button" id="aba-entrar" class="aba ativa">Entrar</button>
+            <button type="button" id="aba-registrar" class="aba">Criar conta</button>
+        </div>
+
+        <div id="painel-entrar" class="cartao">
+            <h3>Conectar-se</h3>
+            <form id="form-entrar">
+                <label for="login-email"><b>E-mail:</b></label><br>
+                <input type="email" id="login-email" name="email" required placeholder="seuemail@exemplo.com"><br>
+
+                <label for="login-senha"><b>Senha:</b></label><br>
+                <input type="password" id="login-senha" name="senha" required placeholder="Digite sua senha"><br>
+
+                <p id="erro-entrar" class="erro"></p>
+
+                <button type="submit" class="botao">Entrar</button>
+            </form>
+            <p class="dica">Ainda não tem conta? <a href="#" id="link-ir-registrar">Registre-se aqui</a>.</p>
+        </div>
+
+        <div id="painel-registrar" class="cartao oculto">
+            <h3>Criar minha conta</h3>
+            <form id="form-registrar">
+                <label for="reg-nome"><b>Nome Completo:</b></label><br>
+                <input type="text" id="reg-nome" name="nome" required placeholder="Seu nome completo"><br>
+
+                <label for="reg-email"><b>E-mail:</b></label><br>
+                <input type="email" id="reg-email" name="email" required placeholder="seuemail@exemplo.com"><br>
+
+                <label for="reg-telefone"><b>Telefone:</b></label><br>
+                <input type="text" id="reg-telefone" name="telefone" required placeholder="(00) 00000-0000"><br>
+
+                <label for="reg-cpf"><b>CPF:</b></label><br>
+                <input type="text" id="reg-cpf" name="cpf" required placeholder="000.000.000-00"><br>
+
+                <label for="reg-senha"><b>Criar Senha:</b></label><br>
+                <input type="password" id="reg-senha" name="senha" required placeholder="Mínimo de 6 caracteres"><br>
+
+                <label for="reg-confirmar-senha"><b>Confirmar Senha:</b></label><br>
+                <input type="password" id="reg-confirmar-senha" name="confirmar_senha" required placeholder="Repita a senha"><br>
+
+                <p id="erro-registrar" class="erro"></p>
+
+                <button type="submit" class="botao">Criar Conta</button>
+            </form>
+            <p class="dica">Já possui uma conta? <a href="#" id="link-ir-entrar">Conecte-se aqui</a>.</p>
+        </div>
+    </div>
+
+    <div id="area-dashboard" class="oculto">
+        <h2>Bem-vindo de volta, <span id="dashboard-nome">[Nome do Cliente]</span>!</h2>
+        <p class="justificar">Aqui você tem controle total sobre os seus dados e os serviços solicitados na Fix it.</p>
+
+        <div class="abas">
+            <button type="button" id="aba-perfil" class="aba ativa">Meus Dados</button>
+            <button type="button" id="aba-servicos" class="aba">Meus Serviços</button>
+        </div>
+
+        <div id="painel-perfil" class="cartao">
+            <h3>Dados da Conta</h3>
+
+            <div id="perfil-visualizacao">
+                <p><b>Nome:</b> <span id="ver-nome"></span></p>
+                <p><b>E-mail:</b> <span id="ver-email"></span></p>
+                <p><b>Telefone:</b> <span id="ver-telefone"></span></p>
+                <p><b>CPF:</b> <span id="ver-cpf"></span></p>
+                <button type="button" id="botao-editar-perfil" class="botao">Editar dados</button>
+            </div>
+
+            <form id="form-perfil" class="oculto">
+                <label for="perfil-nome"><b>Nome Completo:</b></label><br>
+                <input type="text" id="perfil-nome" name="nome" required><br>
+
+                <label for="perfil-email"><b>E-mail:</b></label><br>
+                <input type="email" id="perfil-email" name="email" required><br>
+
+                <label for="perfil-telefone"><b>Telefone:</b></label><br>
+                <input type="text" id="perfil-telefone" name="telefone" required><br>
+
+                <label for="perfil-cpf"><b>CPF:</b></label><br>
+                <input type="text" id="perfil-cpf" name="cpf" required><br>
+
+                <label for="perfil-senha"><b>Nova Senha (opcional):</b></label><br>
+                <input type="password" id="perfil-senha" name="senha" placeholder="Deixe em branco para manter a atual"><br>
+
+                <p id="erro-perfil" class="erro"></p>
+
+                <button type="submit" class="botao">Salvar alterações</button>
+                <button type="button" id="botao-cancelar-perfil" class="botao secundario">Cancelar</button>
+            </form>
+
+            <p id="msg-perfil" class="sucesso"></p>
+        </div>
+
+        <div id="painel-servicos" class="cartao oculto">
+            <h3>Serviços Solicitados</h3>
+            <div class="justificar">
+                <ul class="lista" id="lista-servicos-cliente">
+                </ul>
+            </div>
+
+            <h3>Histórico Geral</h3>
+            <p id="resumo-historico" class="justificar"></p>
+        </div>
+
+        <div id="painel-pagamento" class="cartao oculto">
+            <h3>Pagamento do Serviço</h3>
+            <p class="justificar"><b>Serviço:</b> <span id="pagamento-nome-servico"></span><br>
+               <b>Valor:</b> <span id="pagamento-valor"></span></p>
+
+            <form id="form-pagamento">
+                <label for="forma-pagamento"><b>Forma de pagamento:</b></label><br>
+                <select id="forma-pagamento" name="forma_pagamento" required
+                    style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px;">
+                    <option value="">Selecione...</option>
+                    <option value="pix">PIX</option>
+                    <option value="cartao_credito">Cartão de Crédito (à vista)</option>
+                    <option value="cartao_debito">Cartão de Débito</option>
+                    <option value="dinheiro">Dinheiro</option>
+                </select><br>
+
+                <p id="erro-pagamento" class="erro"></p>
+
+                <button type="submit" class="botao">Confirmar Pagamento</button>
+                <button type="button" id="botao-cancelar-pagamento" class="botao secundario">Voltar</button>
+            </form>
+        </div>
+
+        <button type="button" id="botao-sair" class="botao perigo">Sair da Conta</button>
+    </div>
+
+    <footer>
+        <div>
+            <h5>Todos os direitos reservados &copy.</h5>
+        </div>
+    </footer>
+</body>
+</html>
