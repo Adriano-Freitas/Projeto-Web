@@ -10,29 +10,19 @@
     </linearGradient>
   </defs>
   <rect width="640" height="360" rx="12" fill="url(#bgGrad4)" stroke="#333338" stroke-width="2"/>
-  
-  <!-- Disco Rígido HDD -->
   <rect x="210" y="70" width="220" height="180" rx="12" fill="#202228" stroke="#444" stroke-width="3"/>
-  <!-- Prato Metálico -->
   <circle cx="320" cy="150" r="55" fill="#2d313a" stroke="#8fd19e" stroke-width="2"/>
   <circle cx="320" cy="150" r="22" fill="#181a20" stroke="#555" stroke-width="2"/>
-  <!-- Braço de Leitura do Disco -->
   <path d="M 380 90 L 325 145" stroke="#ccc" stroke-width="5" stroke-linecap="round"/>
   <circle cx="380" cy="90" r="8" fill="#555"/>
-  
-  <!-- Escudo de Proteção / Resgate de Dados -->
   <g transform="translate(320, 150)">
     <path d="M 0 -35 L 28 -20 L 28 10 C 28 28 0 42 0 42 C 0 42 -28 28 -28 10 L -28 -20 Z" fill="url(#greenGrad)" opacity="0.9" stroke="#fff" stroke-width="2"/>
-    <!-- Checkmark dentro do escudo -->
     <path d="M -10 8 L -2 16 L 12 -4" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  
-  <!-- Binários de Fundo -->
   <text x="120" y="120" fill="#2ecc71" opacity="0.35" font-family="monospace" font-size="14">01010100 1101</text>
   <text x="120" y="150" fill="#2ecc71" opacity="0.35" font-family="monospace" font-size="14">RECOVER_OK</text>
   <text x="470" y="130" fill="#2ecc71" opacity="0.35" font-family="monospace" font-size="14">10110010 0110</text>
   <text x="470" y="160" fill="#2ecc71" opacity="0.35" font-family="monospace" font-size="14">DATA_SAVED</text>
-  
   <text x="320" y="305" fill="#d8b98a" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" letter-spacing="1">RECUPERAÇÃO DE DADOS</text>
   <text x="320" y="328" fill="#888" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Resgate Seguro de Arquivos, HDs, SSDs e Pen Drives</text>
 </svg>

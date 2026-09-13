@@ -10,12 +10,8 @@
     </linearGradient>
   </defs>
   <rect width="640" height="360" rx="12" fill="url(#bgGrad5)" stroke="#333338" stroke-width="2"/>
-  
-  <!-- Cooler com fluxo de ar limpo -->
   <circle cx="320" cy="150" r="75" fill="#181a20" stroke="#333" stroke-width="4"/>
   <circle cx="320" cy="150" r="65" fill="#1e222a" stroke="#48cae4" stroke-width="2" stroke-dasharray="6 4"/>
-  
-  <!-- Pás do Ventilador -->
   <g transform="translate(320, 150)">
     <circle cx="0" cy="0" r="20" fill="#333" stroke="#48cae4" stroke-width="2"/>
     <path d="M 0 -20 Q 20 -45 0 -60 Q -10 -45 0 -20 Z" fill="url(#tealGrad)"/>
@@ -23,12 +19,9 @@
     <path d="M 0 20 Q -20 45 0 60 Q 10 45 0 20 Z" fill="url(#tealGrad)"/>
     <path d="M -20 0 Q -45 -20 -60 0 Q -45 10 -20 0 Z" fill="url(#tealGrad)"/>
   </g>
-  
-  <!-- Brilhos / Efeito Limpo (Sparkles) -->
   <path d="M 210 100 L 215 115 L 230 120 L 215 125 L 210 140 L 205 125 L 190 120 L 205 115 Z" fill="#bfa071"/>
   <path d="M 440 180 L 443 190 L 453 193 L 443 196 L 440 206 L 437 196 L 427 193 L 437 190 Z" fill="#48cae4"/>
   <path d="M 410 85 L 413 93 L 421 95 L 413 97 L 410 105 L 407 97 L 399 95 L 407 93 Z" fill="#8fd19e"/>
-  
   <text x="320" y="305" fill="#d8b98a" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" letter-spacing="1">LIMPEZA PREVENTIVA</text>
   <text x="320" y="328" fill="#888" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Troca de Pasta Térmica, Higienização Interna &amp; Refrigeração</text>
 </svg>
