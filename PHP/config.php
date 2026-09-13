@@ -12,11 +12,9 @@ if (file_exists($caminhoEnv)) {
             list($chave, $valor) = explode('=', $linha, 2);
             $chave = trim($chave);
             $valor = trim(trim($valor), '"\'');
-            if (getenv($chave) === false && !array_key_exists($chave, $_ENV)) {
-                putenv("{$chave}={$valor}");
-                $_ENV[$chave] = $valor;
-                $_SERVER[$chave] = $valor;
-            }
+            putenv("{$chave}={$valor}");
+            $_ENV[$chave] = $valor;
+            $_SERVER[$chave] = $valor;
         }
     }
 }
