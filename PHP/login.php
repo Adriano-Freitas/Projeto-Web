@@ -2,10 +2,10 @@
 include "conexao.php";
 header("Content-Type: application/json");
 
-$email = isset($_POST["email"]) ? trim($_POST["email"]) : "";
+$email = isset($_POST["email"]) ? trim(strtolower($_POST["email"])) : "";
 $senha = isset($_POST["senha"]) ? $_POST["senha"] : "";
 
-$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE email = ?");
+$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE LOWER(email) = ?");
 $stmt->execute([$email]);
 
 $linha = $stmt->fetch();

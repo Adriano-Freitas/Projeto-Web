@@ -5,10 +5,10 @@
 	$erro = "";
 
 	if ($_SERVER["REQUEST_METHOD"] === "POST") {
-		$email = trim($_POST["email"]);
+		$email = trim(strtolower($_POST["email"]));
 		$senha = $_POST["senha"];
 
-		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE email = ?");
+		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE LOWER(email) = ?");
 		$stmt->execute([$email]);
 		$linha = $stmt->fetch();
 
