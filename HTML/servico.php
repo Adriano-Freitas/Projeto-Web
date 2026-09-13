@@ -8,5 +8,5 @@ if(!$s){ http_response_code(404); echo '<section><h1>Serviço não encontrado</h
 <section><span class="badge"><?=e($s['categoria'])?></span><h1><?=e($s['titulo'])?></h1>
 <p><?=e($s['descricao'])?></p>
 <div class="card"><h2>Detalhes</h2><p><?=nl2br(e($s['conteudo']))?></p><p><strong>Valor base:</strong> <?=valorBR($s['preco_base'])?></p>
-<?php if(usuarioAtual()): ?><a class="btn" href="solicitar.php?servico=<?=$s['id']?>">Solicitar este serviço</a><?php else: ?><a class="btn" href="conta.php">Entre para solicitar</a><?php endif; ?></div></section>
+<?php if(clientesAtual()): ?><a class="btn" href="solicitar.php?servico=<?=$s['id']?>">Solicitar este serviço</a><?php else: ?><a class="btn" href="conta.php">Entre para solicitar</a><?php endif; ?></div></section>
 <?php require_once __DIR__ . '/../PHP/includes/footer.php'; ?>

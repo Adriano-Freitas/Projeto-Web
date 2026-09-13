@@ -3,12 +3,12 @@
 	// Arquivos (cabeçalho/rodapé) e controle de acesso por sessão (RF10).
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["usuario"]) || !in_array($_SESSION["usuario"]["tipo"], array("gerente", "tecnico"))) {
+	if (!isset($_SESSION["clientes"]) || !in_array($_SESSION["clientes"]["tipo"], array("gerente", "tecnico"))) {
 		header("Location: index.php");
 		exit;
 	}
 
-	$usuarioLogado = $_SESSION["usuario"];
+	$clientesLogado = $_SESSION["clientes"];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -22,13 +22,13 @@
 		<h1>Fix it: Módulo Administrativo</h1>
 		<p>
 			<a href="index.php">[Início]</a>
-			<?php if ($usuarioLogado["tipo"] === "gerente") { ?>
-				<a href="usuarios.php">[Usuários]</a>
+			<?php if ($clientesLogado["tipo"] === "gerente") { ?>
+				<a href="clientes.php">[Usuários]</a>
 				<a href="categorias.php">[Categorias]</a>
 				<a href="servicos.php">[Serviços/Artigos]</a>
 			<?php } ?>
 			<a href="ordens.php">[Ordens de Serviço]</a>
 			<a href="../../HTML/index.html">[Ver Site]</a>
-			<a href="logout.php">[Sair (<?php echo htmlspecialchars($usuarioLogado["nome"]); ?>)]</a>
+			<a href="logout.php">[Sair (<?php echo htmlspecialchars($clientesLogado["nome"]); ?>)]</a>
 		</p>
 	</div>

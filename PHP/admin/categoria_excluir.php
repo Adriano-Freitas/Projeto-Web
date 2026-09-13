@@ -1,7 +1,7 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["usuario"]) || $_SESSION["usuario"]["tipo"] !== "gerente") {
+	if (!isset($_SESSION["clientes"]) || $_SESSION["clientes"]["tipo"] !== "gerente") {
 		header("Location: index.php");
 		exit;
 	}

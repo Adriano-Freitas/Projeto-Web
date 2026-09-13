@@ -4,7 +4,7 @@
     <a class="brand" href="../../HTML/index.php">Fix<span>It</span> CMS</a>
     <nav>
       <a href="index.php">Painel</a>
-      <a href="usuarios.php">Usuários</a>
+      <a href="clientes.php">Usuários</a>
       <a href="categorias.php">Categorias</a>
       <a href="artigos.php">Serviços</a>
       <a href="ordens.php">Ordens</a>

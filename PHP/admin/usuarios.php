@@ -1,18 +1,18 @@
 <?php
 	include "header.php";
 
-	if ($usuarioLogado["tipo"] !== "gerente") {
+	if ($clientesLogado["tipo"] !== "gerente") {
 		echo "<p class=\"erro\">Acesso restrito ao Gerente.</p>";
 		include "footer.php";
 		exit;
 	}
 
-	$resultado = $conexao->query("SELECT id, nome, email, telefone, cpf, tipo, status FROM usuarios ORDER BY nome");
+	$resultado = $conexao->query("SELECT id, nome, email, telefone, cpf, tipo, status FROM clientes ORDER BY nome");
 ?>
 	<h2>Gestão de Usuários (Clientes, Técnicos e Gerentes)</h2>
 
 	<div class="justificar">
-		<p><a href="usuario_form.php" class="botao">+ Novo Usuário</a></p>
+		<p><a href="clientes_form.php" class="botao">+ Novo Usuário</a></p>
 
 		<table class="tabela-admin">
 			<tr>
@@ -27,8 +27,8 @@
 					<td><?php echo ucfirst($linha["tipo"]); ?></td>
 					<td><?php echo htmlspecialchars($linha["status"]); ?></td>
 					<td>
-						<a href="usuario_form.php?id=<?php echo $linha['id']; ?>">[Editar]</a>
-						<a href="usuario_excluir.php?id=<?php echo $linha['id']; ?>" onclick="return confirm('Excluir este usuário?');">[Excluir]</a>
+						<a href="clientes_form.php?id=<?php echo $linha['id']; ?>">[Editar]</a>
+						<a href="clientes_excluir.php?id=<?php echo $linha['id']; ?>" onclick="return confirm('Excluir este usuário?');">[Excluir]</a>
 					</td>
 				</tr>
 			<?php } ?>

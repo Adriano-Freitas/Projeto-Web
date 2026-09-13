@@ -2,12 +2,12 @@
 include "conexao.php";
 header("Content-Type: application/json");
 
-if (!isset($_SESSION["usuario"])) {
+if (!isset($_SESSION["clientes"])) {
     echo json_encode(array("sucesso" => false, "mensagem" => "Sessão expirada."));
     exit;
 }
 
-$id = $_SESSION["usuario"]["id"];
+$id = $_SESSION["clientes"]["id"];
 $nome = isset($_POST["nome"]) ? trim($_POST["nome"]) : "";
 $email = isset($_POST["email"]) ? trim($_POST["email"]) : "";
 $telefone = isset($_POST["telefone"]) ? trim($_POST["telefone"]) : "";
@@ -31,25 +31,25 @@ if (!empty($senha)) {
     }
 
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-    $stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, email = ?, telefone = ?, cpf = ?, senha = ? WHERE id = ?");
+    $stmt = $conexao->prepare("UPDATE clientes SET nome = ?, email = ?, telefone = ?, cpf = ?, senha = ? WHERE id = ?");
     $stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash, $id]);
 } else {
-    $stmt = $conexao->prepare("UPDATE usuarios SET nome = ?, email = ?, telefone = ?, cpf = ? WHERE id = ?");
+    $stmt = $conexao->prepare("UPDATE clientes SET nome = ?, email = ?, telefone = ?, cpf = ? WHERE id = ?");
     $stmt->execute([$nome, $email, $telefone, $cpf, $id]);
 }
 
-$usuario = array(
+$clientes = array(
     "id" => $id,
     "nome" => $nome,
     "email" => $email,
     "telefone" => $telefone,
     "cpf" => $cpf,
-    "tipo" => $_SESSION["usuario"]["tipo"]
+    "tipo" => $_SESSION["clientes"]["tipo"]
 );
 
-$_SESSION["usuario"] = $usuario;
+$_SESSION["clientes"] = $clientes;
 
-registrarAuditoria($conexao, "ATUALIZACAO", "usuarios", $id, "Cliente atualizou os próprios dados de cadastro.");
+registrarAuditoria($conexao, "ATUALIZACAO", "clientes", $id, "Cliente atualizou os próprios dados de cadastro.");
 
-echo json_encode(array("sucesso" => true, "usuario" => $usuario));
+echo json_encode(array("sucesso" => true, "clientes" => $clientes));
 ?>

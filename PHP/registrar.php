@@ -23,7 +23,7 @@ if (strlen($senha) < 6) {
     exit;
 }
 
-$stmt = $conexao->prepare("SELECT id FROM usuarios WHERE email = ? OR cpf = ?");
+$stmt = $conexao->prepare("SELECT id FROM clientes WHERE email = ? OR cpf = ?");
 $stmt->execute([$email, $cpf]);
 
 if ($stmt->fetch()) {
@@ -34,13 +34,13 @@ if ($stmt->fetch()) {
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 $tipo = "cliente";
 
-$stmt = $conexao->prepare("INSERT INTO usuarios (nome, email, telefone, cpf, senha, tipo) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, senha, tipo) VALUES (?, ?, ?, ?, ?, ?)");
 $stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash, $tipo]);
 
-$id_usuario = $conexao->lastInsertId();
+$id_clientes = $conexao->lastInsertId();
 
-$usuario = array(
-    "id" => (int) $id_usuario,
+$clientes = array(
+    "id" => (int) $id_clientes,
     "nome" => $nome,
     "email" => $email,
     "telefone" => $telefone,
@@ -48,9 +48,9 @@ $usuario = array(
     "tipo" => $tipo
 );
 
-$_SESSION["usuario"] = $usuario;
+$_SESSION["clientes"] = $clientes;
 
-registrarAuditoria($conexao, "CADASTRO", "usuarios", $usuario["id"], "Novo cliente cadastrado (auto cadastro).");
+registrarAuditoria($conexao, "CADASTRO", "clientes", $clientes["id"], "Novo cliente cadastrado (auto cadastro).");
 
-echo json_encode(array("sucesso" => true, "usuario" => $usuario));
+echo json_encode(array("sucesso" => true, "clientes" => $clientes));
 ?>

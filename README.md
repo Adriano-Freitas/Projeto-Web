@@ -23,7 +23,7 @@ Projeto adaptado ao roteiro da disciplina e às especificações do FixIt.
 
 ## Primeiro acesso ao CMS
 O banco não cria um gerente automaticamente porque isso exigiria uma senha inicial insegura. Crie o primeiro usuário cliente pela página de conta e depois promova-o para `gerente` diretamente no PostgreSQL:
-`UPDATE usuarios SET perfil='gerente' WHERE email='SEU_EMAIL';`
+`UPDATE clientes SET perfil='gerente' WHERE email='SEU_EMAIL';`
 Depois faça login novamente.
 
 ## Observação sobre o escopo

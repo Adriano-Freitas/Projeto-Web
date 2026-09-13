@@ -2,12 +2,12 @@
 	// UC02 (RF05) - Abertura de Ordem de Serviço.
 	include "conexao.php";
 
-	if (!isset($_SESSION["usuario"])) {
+	if (!isset($_SESSION["clientes"])) {
 		header("Location: ../HTML/conta.html");
 		exit;
 	}
 
-	$id_cliente = $_SESSION["usuario"]["id"];
+	$id_cliente = $_SESSION["clientes"]["id"];
 
 	$pasta_destino = "uploads/pecas/";
 

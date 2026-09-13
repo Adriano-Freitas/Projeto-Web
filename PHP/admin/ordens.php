@@ -14,7 +14,7 @@
 			$stmt = $conexao->prepare("UPDATE ordens_servico SET status = ?, id_tecnico = ? WHERE id = ?");
 		}
 
-		$id_tecnico_responsavel = $usuarioLogado["tipo"] === "tecnico" ? $usuarioLogado["id"] : null;
+		$id_tecnico_responsavel = $clientesLogado["tipo"] === "tecnico" ? $clientesLogado["id"] : null;
 		$stmt->bind_param("sii", $novo_status, $id_tecnico_responsavel, $id_ordem);
 		$stmt->execute();
 
@@ -27,7 +27,7 @@
 	$resultado = $conexao->query(
 		"SELECT o.id, u.nome AS cliente, s.nome AS servico, o.status, o.valor_total, o.pago, o.data_abertura
 		 FROM ordens_servico o
-		 INNER JOIN usuarios u ON u.id = o.id_cliente
+		 INNER JOIN clientes u ON u.id = o.id_cliente
 		 INNER JOIN servicos s ON s.id = o.id_servico
 		 ORDER BY o.data_abertura DESC"
 	);

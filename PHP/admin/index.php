@@ -8,7 +8,7 @@
 		$email = trim($_POST["email"]);
 		$senha = $_POST["senha"];
 
-		$stmt = $conexao->prepare("SELECT id, nome, email, telefone, cpf, senha, tipo FROM usuarios WHERE email = ? AND tipo IN ('gerente', 'tecnico')");
+		$stmt = $conexao->prepare("SELECT id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE email = ? AND tipo IN ('gerente', 'tecnico')");
 		$stmt->bind_param("s", $email);
 		$stmt->execute();
 		$resultado = $stmt->get_result();
@@ -17,7 +17,7 @@
 		if (!$linha || !password_verify($senha, $linha["senha"])) {
 			$erro = "E-mail ou senha inválidos, ou usuário sem permissão administrativa.";
 		} else {
-			$_SESSION["usuario"] = array(
+			$_SESSION["clientes"] = array(
 				"id" => (int) $linha["id"],
 				"nome" => $linha["nome"],
 				"email" => $linha["email"],
@@ -26,23 +26,23 @@
 				"tipo" => $linha["tipo"]
 			);
 
-			registrarAuditoria($conexao, "LOGIN_ADMIN", "usuarios", $linha["id"], "Login no Módulo Administrativo.");
+			registrarAuditoria($conexao, "LOGIN_ADMIN", "clientes", $linha["id"], "Login no Módulo Administrativo.");
 
 			header("Location: index.php");
 			exit;
 		}
 	}
 
-	if (isset($_SESSION["usuario"]) && in_array($_SESSION["usuario"]["tipo"], array("gerente", "tecnico"))) {
+	if (isset($_SESSION["clientes"]) && in_array($_SESSION["clientes"]["tipo"], array("gerente", "tecnico"))) {
 		include "header.php";
 ?>
 		<h2>Painel Administrativo</h2>
 		<div class="justificar">
-			<p>Bem-vindo(a), <b><?php echo htmlspecialchars($usuarioLogado["nome"]); ?></b>
-			 (<?php echo $usuarioLogado["tipo"] === "gerente" ? "Gerente" : "Técnico"; ?>).</p>
+			<p>Bem-vindo(a), <b><?php echo htmlspecialchars($clientesLogado["nome"]); ?></b>
+			 (<?php echo $clientesLogado["tipo"] === "gerente" ? "Gerente" : "Técnico"; ?>).</p>
 
-			<?php if ($usuarioLogado["tipo"] === "gerente") { ?>
-				<p>Como Gerente, você pode gerenciar <a href="usuarios.php">Usuários</a>,
+			<?php if ($clientesLogado["tipo"] === "gerente") { ?>
+				<p>Como Gerente, você pode gerenciar <a href="clientes.php">Usuários</a>,
 				<a href="categorias.php">Categorias</a> e o <a href="servicos.php">Catálogo de Serviços</a>.</p>
 			<?php } else { ?>
 				<p>Como Técnico, você pode visualizar e atualizar as <a href="ordens.php">Ordens de Serviço</a>.</p>

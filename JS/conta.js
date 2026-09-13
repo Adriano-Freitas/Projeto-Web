@@ -93,10 +93,10 @@ document.addEventListener("DOMContentLoaded", function () {
         areaDashboard.classList.add("oculto");
     }
 
-    function mostrarDashboard(usuario) {
+    function mostrarDashboard(clientes) {
         areaVisitante.classList.add("oculto");
         areaDashboard.classList.remove("oculto");
-        preencherPerfil(usuario);
+        preencherPerfil(clientes);
         carregarServicos();
     }
 
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var resposta = await buscarDoPHP("verificar_sessao.php");
 
             if (resposta && resposta.logado) {
-                mostrarDashboard(resposta.usuario);
+                mostrarDashboard(resposta.clientes);
             } else {
                 mostrarVisitante();
             }
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             formEntrar.reset();
-            mostrarDashboard(resposta.usuario);
+            mostrarDashboard(resposta.clientes);
         } catch (erro) {
             erroEntrar.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
             console.error(erro);
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             formRegistrar.reset();
-            mostrarDashboard(resposta.usuario);
+            mostrarDashboard(resposta.clientes);
         } catch (erro) {
             erroRegistrar.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
             console.error(erro);
@@ -231,17 +231,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    function preencherPerfil(usuario) {
-        document.getElementById("dashboard-nome").textContent = usuario.nome;
-        document.getElementById("ver-nome").textContent = usuario.nome;
-        document.getElementById("ver-email").textContent = usuario.email;
-        document.getElementById("ver-telefone").textContent = usuario.telefone;
-        document.getElementById("ver-cpf").textContent = usuario.cpf;
+    function preencherPerfil(clientes) {
+        document.getElementById("dashboard-nome").textContent = clientes.nome;
+        document.getElementById("ver-nome").textContent = clientes.nome;
+        document.getElementById("ver-email").textContent = clientes.email;
+        document.getElementById("ver-telefone").textContent = clientes.telefone;
+        document.getElementById("ver-cpf").textContent = clientes.cpf;
 
-        document.getElementById("perfil-nome").value = usuario.nome;
-        document.getElementById("perfil-email").value = usuario.email;
-        document.getElementById("perfil-telefone").value = usuario.telefone;
-        document.getElementById("perfil-cpf").value = usuario.cpf;
+        document.getElementById("perfil-nome").value = clientes.nome;
+        document.getElementById("perfil-email").value = clientes.email;
+        document.getElementById("perfil-telefone").value = clientes.telefone;
+        document.getElementById("perfil-cpf").value = clientes.cpf;
         document.getElementById("perfil-senha").value = "";
 
         msgPerfil.textContent = "";
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             var resposta = await buscarDoPHP("verificar_sessao.php");
             if (resposta && resposta.logado) {
-                preencherPerfil(resposta.usuario);
+                preencherPerfil(resposta.clientes);
             }
         } catch (erro) {
             console.error(erro);
@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            preencherPerfil(resposta.usuario);
+            preencherPerfil(resposta.clientes);
             formPerfil.classList.add("oculto");
             perfilVisualizacao.classList.remove("oculto");
             msgPerfil.textContent = "Dados atualizados com sucesso!";

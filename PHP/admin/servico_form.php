@@ -1,7 +1,7 @@
 <?php
 	include "header.php";
 
-	if ($usuarioLogado["tipo"] !== "gerente") {
+	if ($clientesLogado["tipo"] !== "gerente") {
 		echo "<p class=\"erro\">Acesso restrito ao Gerente.</p>";
 		include "footer.php";
 		exit;

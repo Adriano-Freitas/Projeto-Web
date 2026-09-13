@@ -2,12 +2,12 @@
 include "conexao.php";
 header("Content-Type: application/json");
 
-if (!isset($_SESSION["usuario"])) {
+if (!isset($_SESSION["clientes"])) {
     echo json_encode(array("sucesso" => false, "mensagem" => "Sessão expirada."));
     exit;
 }
 
-$id_cliente = $_SESSION["usuario"]["id"];
+$id_cliente = $_SESSION["clientes"]["id"];
 $id_ordem = isset($_POST["id_servico"]) ? (int) $_POST["id_servico"] : 0;
 $forma_pagamento = isset($_POST["forma_pagamento"]) ? $_POST["forma_pagamento"] : "";
 

@@ -7,25 +7,25 @@ require_once __DIR__ . '/../conexao.php';
 function e($value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
-function usuarioAtual(): ?array {
-    return $_SESSION['usuario'] ?? null;
+function clientesAtual(): ?array {
+    return $_SESSION['clientes'] ?? null;
 }
 function exigirLogin(): void {
-    if (!usuarioAtual()) {
+    if (!clientesAtual()) {
         header('Location: ../../HTML/conta.php');
         exit;
     }
 }
 function exigirAdmin(): void {
     exigirLogin();
-    if (!in_array($_SESSION['usuario']['perfil'], ['gerente', 'tecnico'], true)) {
+    if (!in_array($_SESSION['clientes']['perfil'], ['gerente', 'tecnico'], true)) {
         http_response_code(403);
         exit('Acesso negado.');
     }
 }
-function registrarAuditoria(PDO $pdo, ?int $usuarioId, string $acao, string $tabela, ?int $registroId, string $descricao=''): void {
-    $stmt = $pdo->prepare('INSERT INTO auditoria (id_usuario, acao, tabela_afetada, id_registro, descricao) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$usuarioId, $acao, $tabela, $registroId, $descricao]);
+function registrarAuditoria(PDO $pdo, ?int $clientesId, string $acao, string $tabela, ?int $registroId, string $descricao=''): void {
+    $stmt = $pdo->prepare('INSERT INTO auditoria (id_clientes, acao, tabela_afetada, id_registro, descricao) VALUES (?, ?, ?, ?, ?)');
+    $stmt->execute([$clientesId, $acao, $tabela, $registroId, $descricao]);
 }
 function csrfToken(): string {
     if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(32));

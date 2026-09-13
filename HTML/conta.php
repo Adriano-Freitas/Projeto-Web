@@ -1,12 +1,12 @@
 <?php require_once __DIR__ . '/../PHP/includes/header.php'; ?>
 <section>
 <h1>Área do Cliente</h1>
-<?php if(!usuarioAtual()): ?>
+<?php if(!clientesAtual()): ?>
 <div class="form-grid">
 <div class="form-card"><h2>Entrar</h2><form action="../PHP/login.php" method="post" data-validar><input type="hidden" name="csrf" value="<?=csrfToken()?>"><label>E-mail</label><input type="email" name="email" required><label>Senha</label><input type="password" name="senha" required><button>Entrar</button></form></div>
 <div class="form-card"><h2>Criar conta</h2><form action="../PHP/registrar.php" method="post" data-validar><input type="hidden" name="csrf" value="<?=csrfToken()?>"><label>Nome</label><input name="nome" required><label>E-mail</label><input type="email" name="email" required><label>Telefone</label><input name="telefone" required><label>CPF</label><input name="cpf"><label>Senha</label><input type="password" name="senha" minlength="6" required><button>Cadastrar</button></form></div>
 </div>
-<?php else: $u=usuarioAtual(); ?>
+<?php else: $u=clientesAtual(); ?>
 <div class="card"><h2>Olá, <?=e($u['nome'])?></h2><p>Perfil: <span class="badge"><?=e($u['perfil'])?></span></p><a class="btn secondary" href="../PHP/logout.php">Sair</a></div>
 <section><h2>Minhas ordens</h2>
 <div id="notificacoes" class="notice">Carregando notificações...</div>

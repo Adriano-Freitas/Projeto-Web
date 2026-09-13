@@ -2,12 +2,12 @@
 include "conexao.php";
 header("Content-Type: application/json");
 
-if (!isset($_SESSION["usuario"])) {
+if (!isset($_SESSION["clientes"])) {
     echo json_encode(array("sucesso" => false, "mensagem" => "Sessão expirada."));
     exit;
 }
 
-$id_cliente = $_SESSION["usuario"]["id"];
+$id_cliente = $_SESSION["clientes"]["id"];
 
 $stmt = $conexao->prepare(
     "SELECT o.id, s.nome, TO_CHAR(o.data_abertura, 'DD/MM/YYYY') AS data, o.status, o.valor_total, o.pago, o.forma_pagamento

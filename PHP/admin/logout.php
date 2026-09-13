@@ -1,11 +1,11 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
-	if (isset($_SESSION["usuario"])) {
-		registrarAuditoria($conexao, "LOGOUT_ADMIN", "usuarios", $_SESSION["usuario"]["id"], "Logout do Módulo Administrativo.");
+	if (isset($_SESSION["clientes"])) {
+		registrarAuditoria($conexao, "LOGOUT_ADMIN", "clientes", $_SESSION["clientes"]["id"], "Logout do Módulo Administrativo.");
 	}
 
-	unset($_SESSION["usuario"]);
+	unset($_SESSION["clientes"]);
 	session_destroy();
 
 	header("Location: index.php");
