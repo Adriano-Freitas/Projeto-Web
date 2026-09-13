@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: "Reparo e conserto completo de computadores e notebooks de diversas marcas e modelos.",
             valor_base: 0,
             status: "ativo",
+            imagem: "../imagens/servicos/manutencao.svg",
             pagina: "./especificacaoServico/manutencao.html"
         },
         {
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: "Instalação limpa, configuração de drivers e otimização para computadores, notebooks e celulares.",
             valor_base: 0,
             status: "ativo",
+            imagem: "../imagens/servicos/formatacao.svg",
             pagina: "./especificacaoServico/formatacao.html"
         },
         {
@@ -23,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: "Projetos personalizados para PCs gamer, uso profissional ou estações de trabalho de alto desempenho.",
             valor_base: 0,
             status: "ativo",
+            imagem: "../imagens/servicos/montagem.svg",
             pagina: "./especificacaoServico/montagem.html"
         },
         {
@@ -31,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: "Resgate seguro de arquivos, documentos e dados perdidos ou corrompidos.",
             valor_base: 0,
             status: "ativo",
+            imagem: "../imagens/servicos/recuperacao.svg",
             pagina: "./especificacaoServico/recuperacao.html"
         },
         {
@@ -39,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
             descricao: "Higienização interna e externa para prevenir superaquecimento e aumentar a vida útil do equipamento.",
             valor_base: 0,
             status: "ativo",
+            imagem: "../imagens/servicos/limpeza.svg",
             pagina: "./especificacaoServico/limpeza.html"
         }
     ];
@@ -57,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             item.innerHTML =
                 "<h3>" + servico.nome + "</h3>" +
+                "<img src='" + servico.imagem + "' alt='" + servico.nome + "' class='servico-img'>" +
                 "<p>" + servico.descricao + "</p>" +
                 "<a href='" + servico.pagina + "'>[Solicitar Serviço]</a>";
 

@@ -1,7 +1,8 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["clientes"]) || $_SESSION["clientes"]["tipo"] !== "gerente") {
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if (!$sessao || $sessao["tipo"] !== "gerente") {
 		header("Location: index.php");
 		exit;
 	}
@@ -9,16 +10,19 @@
 	$id = (int) $_POST["id"];
 	$nome = trim($_POST["nome"]);
 
-	if ($id > 0) {
-		$stmt = $conexao->prepare("UPDATE categorias SET nome = ? WHERE id = ?");
-		$stmt->bind_param("si", $nome, $id);
-		$stmt->execute();
-		registrarAuditoria($conexao, "ATUALIZACAO", "categorias", $id, "Categoria renomeada para " . $nome . ".");
-	} else {
-		$stmt = $conexao->prepare("INSERT INTO categorias (nome) VALUES (?)");
-		$stmt->bind_param("s", $nome);
-		$stmt->execute();
-		registrarAuditoria($conexao, "CADASTRO", "categorias", $conexao->insert_id, "Nova categoria cadastrada: " . $nome . ".");
+	try {
+		if ($id > 0) {
+			$stmt = $conexao->prepare("UPDATE categorias SET nome = ? WHERE id = ?");
+			$stmt->execute([$nome, $id]);
+			registrarAuditoria($conexao, "ATUALIZACAO", "categorias", $id, "Categoria renomeada para " . $nome . ".");
+		} else {
+			$stmt = $conexao->prepare("INSERT INTO categorias (nome) VALUES (?) RETURNING id");
+			$stmt->execute([$nome]);
+			$novoId = $stmt->fetchColumn();
+			registrarAuditoria($conexao, "CADASTRO", "categorias", $novoId, "Nova categoria cadastrada: " . $nome . ".");
+		}
+	} catch (PDOException $e) {
+		// Tabela não existe no banco
 	}
 
 	header("Location: categorias.php");

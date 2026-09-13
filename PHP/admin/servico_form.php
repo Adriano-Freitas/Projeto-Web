@@ -11,17 +11,13 @@
 	$servico = array("id" => 0, "id_categoria" => "", "nome" => "", "descricao" => "", "valor_base" => "0.00", "status" => "Ativo");
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id, id_categoria, nome, descricao, valor_base, status FROM servicos WHERE id = ?");
-		$stmt->bind_param("i", $id);
-		$stmt->execute();
-		$resultado = $stmt->get_result();
-
-		if ($resultado->num_rows > 0) {
-			$servico = $resultado->fetch_assoc();
+		$stmt = $conexao->prepare("SELECT id_servico AS id, nome, descricao, valor_base, status FROM servicos WHERE id_servico = ?");
+		$stmt->execute([$id]);
+		$dado = $stmt->fetch();
+		if ($dado) {
+			$servico = array_merge($servico, $dado);
 		}
 	}
-
-	$categorias = $conexao->query("SELECT id, nome FROM categorias ORDER BY nome");
 ?>
 	<h2><?php echo $id > 0 ? "Editar Serviço" : "Novo Serviço"; ?></h2>
 
@@ -33,12 +29,8 @@
 			<input type="text" name="nome" required value="<?php echo htmlspecialchars($servico["nome"]); ?>"><br>
 
 			<label><b>Categoria:</b></label><br>
-			<select name="id_categoria" required>
-				<?php while ($cat = $categorias->fetch_assoc()) { ?>
-					<option value="<?php echo $cat['id']; ?>" <?php echo ((string) $servico["id_categoria"] === (string) $cat["id"]) ? "selected" : ""; ?>>
-						<?php echo htmlspecialchars($cat["nome"]); ?>
-					</option>
-				<?php } ?>
+			<select name="id_categoria">
+				<option value="1">Geral</option>
 			</select><br>
 
 			<label><b>Descrição:</b></label><br>

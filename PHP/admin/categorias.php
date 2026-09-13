@@ -7,7 +7,17 @@
 		exit;
 	}
 
-	$resultado = $conexao->query("SELECT id, nome FROM categorias ORDER BY nome");
+	$categorias = array();
+	try {
+		$resultado = $conexao->query("SELECT id, nome FROM categorias ORDER BY nome");
+		if ($resultado) {
+			$categorias = $resultado->fetchAll();
+		}
+	} catch (PDOException $e) {
+		$categorias = array(
+			array("id" => 1, "nome" => "Geral")
+		);
+	}
 ?>
 	<h2>Gestão de Categorias/Tipos de Serviço</h2>
 
@@ -16,7 +26,7 @@
 
 		<table class="tabela-admin">
 			<tr><th>Nome</th><th>Ações</th></tr>
-			<?php while ($linha = $resultado->fetch_assoc()) { ?>
+			<?php foreach ($categorias as $linha) { ?>
 				<tr>
 					<td><?php echo htmlspecialchars($linha["nome"]); ?></td>
 					<td>

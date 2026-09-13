@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    container_name: fixit-app
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: unless-stopped

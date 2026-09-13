@@ -3,12 +3,13 @@
 	// Arquivos (cabeçalho/rodapé) e controle de acesso por sessão (RF10).
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["clientes"]) || !in_array($_SESSION["clientes"]["tipo"], array("gerente", "tecnico"))) {
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if (!$sessao || !in_array($sessao["tipo"], array("gerente", "tecnico"))) {
 		header("Location: index.php");
 		exit;
 	}
 
-	$clientesLogado = $_SESSION["clientes"];
+	$clientesLogado = $sessao;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -23,7 +24,7 @@
 		<p>
 			<a href="index.php">[Início]</a>
 			<?php if ($clientesLogado["tipo"] === "gerente") { ?>
-				<a href="clientes.php">[Usuários]</a>
+				<a href="usuarios.php">[Usuários]</a>
 				<a href="categorias.php">[Categorias]</a>
 				<a href="servicos.php">[Serviços/Artigos]</a>
 			<?php } ?>

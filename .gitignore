@@ -1,0 +1,10 @@
+# Arquivo de variáveis de ambiente com credenciais sensíveis
+.env
+
+# Uploads gerados por usuários
+PHP/uploads/pecas/*
+!PHP/uploads/pecas/.gitkeep
+
+# Logs e arquivos do sistema
+*.log
+.DS_Store

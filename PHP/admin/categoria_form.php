@@ -11,13 +11,15 @@
 	$categoria = array("id" => 0, "nome" => "");
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id, nome FROM categorias WHERE id = ?");
-		$stmt->bind_param("i", $id);
-		$stmt->execute();
-		$resultado = $stmt->get_result();
-
-		if ($resultado->num_rows > 0) {
-			$categoria = $resultado->fetch_assoc();
+		try {
+			$stmt = $conexao->prepare("SELECT id, nome FROM categorias WHERE id = ?");
+			$stmt->execute([$id]);
+			$dado = $stmt->fetch();
+			if ($dado) {
+				$categoria = $dado;
+			}
+		} catch (PDOException $e) {
+			// Tabela não existe no banco
 		}
 	}
 ?>

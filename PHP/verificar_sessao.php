@@ -2,8 +2,9 @@
 	include "conexao.php";
 	header("Content-Type: application/json");
 
-	if (isset($_SESSION["clientes"])) {
-		echo json_encode(array("logado" => true, "clientes" => $_SESSION["clientes"]));
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if ($sessao) {
+		echo json_encode(array("logado" => true, "clientes" => $sessao, "usuario" => $sessao));
 	} else {
 		echo json_encode(array("logado" => false));
 	}

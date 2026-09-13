@@ -1,7 +1,8 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["clientes"]) || $_SESSION["clientes"]["tipo"] !== "gerente") {
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if (!$sessao || $sessao["tipo"] !== "gerente") {
 		header("Location: index.php");
 		exit;
 	}
@@ -11,48 +12,41 @@
 	$email = trim($_POST["email"]);
 	$telefone = trim($_POST["telefone"]);
 	$cpf = trim($_POST["cpf"]);
-	$tipo = $_POST["tipo"];
-	$especialidade = trim($_POST["especialidade"]);
-	$status = $_POST["status"];
 	$senha = isset($_POST["senha"]) ? $_POST["senha"] : "";
 
-	// RN01 - não permite duplicidade de CPF/e-mail (validação também
-	// feita no cadastro público em registrar.php).
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id FROM clientes WHERE (email = ? OR cpf = ?) AND id != ?");
-		$stmt->bind_param("ssi", $email, $cpf, $id);
+		$stmt = $conexao->prepare("SELECT id_cliente FROM clientes WHERE (email = ? OR cpf = ?) AND id_cliente != ?");
+		$stmt->execute([$email, $cpf, $id]);
 	} else {
-		$stmt = $conexao->prepare("SELECT id FROM clientes WHERE email = ? OR cpf = ?");
-		$stmt->bind_param("ss", $email, $cpf);
+		$stmt = $conexao->prepare("SELECT id_cliente FROM clientes WHERE email = ? OR cpf = ?");
+		$stmt->execute([$email, $cpf]);
 	}
-	$stmt->execute();
 
-	if ($stmt->get_result()->num_rows > 0) {
-		header("Location: clientes_form.php?id=" . $id . "&erro=duplicado");
+	if ($stmt->fetch()) {
+		header("Location: usuario_form.php?id=" . $id . "&erro=duplicado");
 		exit;
 	}
 
 	if ($id > 0) {
 		if (!empty($senha)) {
 			$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=?, status=?, senha=? WHERE id=?");
-			$stmt->bind_param("ssssssssi", $nome, $email, $telefone, $cpf, $tipo, $especialidade, $status, $senha_hash, $id);
+			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, senha=? WHERE id_cliente=?");
+			$stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash, $id]);
 		} else {
-			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=?, status=? WHERE id=?");
-			$stmt->bind_param("sssssssi", $nome, $email, $telefone, $cpf, $tipo, $especialidade, $status, $id);
+			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=? WHERE id_cliente=?");
+			$stmt->execute([$nome, $email, $telefone, $cpf, $id]);
 		}
-		$stmt->execute();
 
 		registrarAuditoria($conexao, "ATUALIZACAO", "clientes", $id, "Gerente atualizou o cadastro de " . $nome . ".");
 	} else {
 		$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-		$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, especialidade, status, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-		$stmt->bind_param("ssssssss", $nome, $email, $telefone, $cpf, $tipo, $especialidade, $status, $senha_hash);
-		$stmt->execute();
+		$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, senha) VALUES (?, ?, ?, ?, ?) RETURNING id_cliente");
+		$stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash]);
+		$novoId = $stmt->fetchColumn();
 
-		registrarAuditoria($conexao, "CADASTRO", "clientes", $conexao->insert_id, "Gerente cadastrou novo usuário (" . $tipo . "): " . $nome . ".");
+		registrarAuditoria($conexao, "CADASTRO", "clientes", $novoId, "Gerente cadastrou novo cliente: " . $nome . ".");
 	}
 
-	header("Location: clientes.php");
+	header("Location: usuarios.php");
 	exit;
 ?>

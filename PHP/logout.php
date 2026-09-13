@@ -7,6 +7,7 @@ if (isset($_SESSION["clientes"])) {
 }
 
 unset($_SESSION["clientes"]);
+unset($_SESSION["usuario"]);
 session_destroy();
 
 echo json_encode(array("sucesso" => true));

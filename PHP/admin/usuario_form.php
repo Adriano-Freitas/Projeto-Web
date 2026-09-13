@@ -11,20 +11,18 @@
 	$clientes = array("id" => 0, "nome" => "", "email" => "", "telefone" => "", "cpf" => "", "tipo" => "cliente", "especialidade" => "", "status" => "Ativo");
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id, nome, email, telefone, cpf, tipo, especialidade, status FROM clientes WHERE id = ?");
-		$stmt->bind_param("i", $id);
-		$stmt->execute();
-		$resultado = $stmt->get_result();
-
-		if ($resultado->num_rows > 0) {
-			$clientes = $resultado->fetch_assoc();
+		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco FROM clientes WHERE id_cliente = ?");
+		$stmt->execute([$id]);
+		$dado = $stmt->fetch();
+		if ($dado) {
+			$clientes = array_merge($clientes, $dado);
 		}
 	}
 ?>
 	<h2><?php echo $id > 0 ? "Editar Usuário" : "Novo Usuário"; ?></h2>
 
 	<div class="justificar cartao" style="max-width: 500px;">
-		<form method="post" action="clientes_salvar.php">
+		<form method="post" action="usuario_salvar.php">
 			<input type="hidden" name="id" value="<?php echo (int) $clientes["id"]; ?>">
 
 			<label><b>Nome:</b></label><br>
@@ -59,7 +57,7 @@
 			<input type="password" name="senha" <?php echo $id > 0 ? "" : "required"; ?>><br>
 
 			<button type="submit" class="botao">Salvar</button>
-			<a href="clientes.php" class="botao secundario">Cancelar</a>
+			<a href="usuarios.php" class="botao secundario">Cancelar</a>
 		</form>
 	</div>
 <?php

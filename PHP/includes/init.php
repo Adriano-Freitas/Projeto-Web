@@ -8,7 +8,10 @@ function e($value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 function clientesAtual(): ?array {
-    return $_SESSION['clientes'] ?? null;
+    return $_SESSION['clientes'] ?? $_SESSION['usuario'] ?? null;
+}
+function usuarioAtual(): ?array {
+    return clientesAtual();
 }
 function exigirLogin(): void {
     if (!clientesAtual()) {
@@ -18,13 +21,14 @@ function exigirLogin(): void {
 }
 function exigirAdmin(): void {
     exigirLogin();
-    if (!in_array($_SESSION['clientes']['perfil'], ['gerente', 'tecnico'], true)) {
+    $tipo = $_SESSION['clientes']['tipo'] ?? $_SESSION['clientes']['perfil'] ?? $_SESSION['usuario']['tipo'] ?? '';
+    if (!in_array($tipo, ['gerente', 'tecnico'], true)) {
         http_response_code(403);
         exit('Acesso negado.');
     }
 }
 function registrarAuditoria(PDO $pdo, ?int $clientesId, string $acao, string $tabela, ?int $registroId, string $descricao=''): void {
-    $stmt = $pdo->prepare('INSERT INTO auditoria (id_clientes, acao, tabela_afetada, id_registro, descricao) VALUES (?, ?, ?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT INTO auditoria (id_usuario, acao, tabela_afetada, id_registro, descricao) VALUES (?, ?, ?, ?, ?)');
     $stmt->execute([$clientesId, $acao, $tabela, $registroId, $descricao]);
 }
 function csrfToken(): string {

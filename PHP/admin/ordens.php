@@ -9,14 +9,12 @@
 		$conclui_ordem = in_array($novo_status, array("Concluído", "Cancelado"));
 
 		if ($conclui_ordem) {
-			$stmt = $conexao->prepare("UPDATE ordens_servico SET status = ?, data_conclusao = NOW(), id_tecnico = ? WHERE id = ?");
+			$stmt = $conexao->prepare("UPDATE ordens_servico SET status = ?, data_conclusao = NOW() WHERE id_ordem = ?");
+			$stmt->execute([$novo_status, $id_ordem]);
 		} else {
-			$stmt = $conexao->prepare("UPDATE ordens_servico SET status = ?, id_tecnico = ? WHERE id = ?");
+			$stmt = $conexao->prepare("UPDATE ordens_servico SET status = ? WHERE id_ordem = ?");
+			$stmt->execute([$novo_status, $id_ordem]);
 		}
-
-		$id_tecnico_responsavel = $clientesLogado["tipo"] === "tecnico" ? $clientesLogado["id"] : null;
-		$stmt->bind_param("sii", $novo_status, $id_tecnico_responsavel, $id_ordem);
-		$stmt->execute();
 
 		registrarAuditoria($conexao, "ATUALIZACAO_STATUS", "ordens_servico", $id_ordem, "Status atualizado para \"" . $novo_status . "\".");
 
@@ -25,10 +23,19 @@
 	}
 
 	$resultado = $conexao->query(
-		"SELECT o.id, u.nome AS cliente, s.nome AS servico, o.status, o.valor_total, o.pago, o.data_abertura
+		"SELECT 
+			o.id_ordem AS id, 
+			u.nome AS cliente, 
+			COALESCE(s.nome, 'Ordem #' || o.id_ordem) AS servico, 
+			o.status, 
+			o.valor_total, 
+			CASE WHEN LOWER(p.status) = 'pago' THEN TRUE ELSE FALSE END AS pago, 
+			o.data_abertura
 		 FROM ordens_servico o
-		 INNER JOIN clientes u ON u.id = o.id_cliente
-		 INNER JOIN servicos s ON s.id = o.id_servico
+		 INNER JOIN clientes u ON u.id_cliente = o.id_cliente
+		 LEFT JOIN ordem_servico_servicos oss ON oss.id_ordem = o.id_ordem
+		 LEFT JOIN servicos s ON s.id_servico = oss.id_servico
+		 LEFT JOIN pagamentos p ON p.id_ordem = o.id_ordem
 		 ORDER BY o.data_abertura DESC"
 	);
 ?>
@@ -37,7 +44,7 @@
 	<div class="justificar">
 		<table class="tabela-admin">
 			<tr><th>#</th><th>Cliente</th><th>Serviço</th><th>Aberta em</th><th>Valor</th><th>Pago</th><th>Status</th><th>Atualizar</th></tr>
-			<?php while ($linha = $resultado->fetch_assoc()) { ?>
+			<?php while ($linha = $resultado->fetch()) { ?>
 				<tr>
 					<td>#<?php echo $linha["id"]; ?></td>
 					<td><?php echo htmlspecialchars($linha["cliente"]); ?></td>

@@ -41,37 +41,45 @@
 			$nome_original = basename($_FILES["imagens"]["name"][$i]);
 			$tipo = $_FILES["imagens"]["type"][$i];
 			$tmp = $_FILES["imagens"]["tmp_name"][$i];
+			$nome_arquivo = "servico" . $id_servico . "_" . time() . "_" . $i . "_" . preg_replace("/[^a-zA-Z0-9._-]/", "", $nome_original);
 
-			if ($tipo === "image/jpeg") {
-				$origem = imagecreatefromjpeg($tmp);
-			} elseif ($tipo === "image/png") {
-				$origem = imagecreatefrompng($tmp);
-			} else {
-				$erros[] = $nome_original . " - formato não suportado.";
-				continue;
+			if (function_exists("imagecreatefromjpeg") && function_exists("imagecreatefrompng")) {
+				$origem = null;
+				if ($tipo === "image/jpeg" || $tipo === "image/jpg") {
+					$origem = @imagecreatefromjpeg($tmp);
+				} elseif ($tipo === "image/png") {
+					$origem = @imagecreatefrompng($tmp);
+				}
+
+				if ($origem) {
+					$largura_original = imagesx($origem);
+					$altura_original = imagesy($origem);
+					$largura_nova = 800;
+
+					if ($largura_original > $largura_nova) {
+						$altura_nova = intval($altura_original * ($largura_nova / $largura_original));
+					} else {
+						$largura_nova = $largura_original;
+						$altura_nova = $altura_original;
+					}
+
+					$redimensionada = imagecreatetruecolor($largura_nova, $altura_nova);
+					imagecopyresampled($redimensionada, $origem, 0, 0, 0, 0, $largura_nova, $altura_nova, $largura_original, $altura_original);
+
+					imagejpeg($redimensionada, $pasta_destino . $nome_arquivo, 85);
+
+					imagedestroy($origem);
+					imagedestroy($redimensionada);
+					$enviados++;
+					continue;
+				}
 			}
 
-			$largura_original = imagesx($origem);
-			$altura_original = imagesy($origem);
-			$largura_nova = 800;
-
-			if ($largura_original > $largura_nova) {
-				$altura_nova = intval($altura_original * ($largura_nova / $largura_original));
+			if (move_uploaded_file($tmp, $pasta_destino . $nome_arquivo)) {
+				$enviados++;
 			} else {
-				$largura_nova = $largura_original;
-				$altura_nova = $altura_original;
+				$erros[] = $nome_original . " - erro ao processar imagem.";
 			}
-
-			$redimensionada = imagecreatetruecolor($largura_nova, $altura_nova);
-			imagecopyresampled($redimensionada, $origem, 0, 0, 0, 0, $largura_nova, $altura_nova, $largura_original, $altura_original);
-
-			$nome_arquivo = "servico" . $id_servico . "_" . time() . "_" . $i . "_" . $nome_original;
-			imagejpeg($redimensionada, $pasta_destino . $nome_arquivo, 85);
-
-			imagedestroy($origem);
-			imagedestroy($redimensionada);
-
-			$enviados++;
 		}
 	}
 
@@ -79,11 +87,9 @@
 	// valor_base cadastrado no catálogo de serviços (Gerenciar Catálogo -
 	// RF04). O valor final só é confirmado após o relatório de gastos do
 	// Técnico e a fatura (ver UC03 na especificação de requisitos).
-	$stmt = $conexao->prepare("SELECT nome, valor_base FROM servicos WHERE id = ? AND status = 'Ativo'");
-	$stmt->bind_param("i", $id_servico);
-	$stmt->execute();
-	$resultado = $stmt->get_result();
-	$servico = $resultado->fetch_assoc();
+	$stmt = $conexao->prepare("SELECT nome, valor_base FROM servicos WHERE id_servico = ? AND LOWER(status) = 'ativo'");
+	$stmt->execute([$id_servico]);
+	$servico = $stmt->fetch();
 
 	$id_ordem = null;
 
@@ -99,14 +105,34 @@
 			$especificacoes .= ucfirst(str_replace("_", " ", $campo)) . ": " . $valor . "; ";
 		}
 
-		$stmt = $conexao->prepare(
-			"INSERT INTO ordens_servico (id_cliente, id_servico, tipo_aparelho, descricao_problema, especificacoes, status, valor_total)
-			 VALUES (?, ?, ?, ?, ?, 'Aguardando análise', ?)"
-		);
-		$stmt->bind_param("iisssd", $id_cliente, $id_servico, $tipo_aparelho, $problema, $especificacoes, $valor_total);
-		$stmt->execute();
+		$descricao_completa = $problema;
+		if (!empty($tipo_aparelho)) {
+			$descricao_completa = "[Aparelho: " . $tipo_aparelho . "] " . $descricao_completa;
+		}
+		if (!empty($especificacoes)) {
+			$descricao_completa .= " | " . $especificacoes;
+		}
 
-		$id_ordem = $conexao->insert_id;
+		$id_equipamento = null;
+		try {
+			$stmtEquip = $conexao->prepare("INSERT INTO equipamentos (id_cliente, tipo, descricao_problema) VALUES (?, ?, ?) RETURNING id_equipamento");
+			$stmtEquip->execute([$id_cliente, !empty($tipo_aparelho) ? $tipo_aparelho : "Aparelho", $problema]);
+			$id_equipamento = $stmtEquip->fetchColumn();
+		} catch (PDOException $e) {
+			error_log("Aviso ao registrar equipamento: " . $e->getMessage());
+		}
+
+		$stmt = $conexao->prepare(
+			"INSERT INTO ordens_servico (id_cliente, id_equipamento, descricao_problema, status, valor_total, data_abertura)
+			 VALUES (?, ?, ?, 'Aguardando análise', ?, NOW()) RETURNING id_ordem"
+		);
+		$stmt->execute([$id_cliente, $id_equipamento, $descricao_completa, $valor_total]);
+		$id_ordem = $stmt->fetchColumn();
+
+		if ($id_ordem) {
+			$stmtItem = $conexao->prepare("INSERT INTO ordem_servico_servicos (id_ordem, id_servico, quantidade, valor_unitario, subtotal) VALUES (?, ?, 1, ?, ?)");
+			$stmtItem->execute([$id_ordem, $id_servico, $valor_total, $valor_total]);
+		}
 
 		registrarAuditoria($conexao, "ABERTURA_ORDEM", "ordens_servico", $id_ordem, "Cliente abriu uma nova ordem de serviço (" . $servico["nome"] . ").");
 	}

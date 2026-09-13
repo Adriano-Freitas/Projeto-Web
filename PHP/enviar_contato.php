@@ -17,23 +17,73 @@ if (empty($nome) || empty($email) || empty($assunto) || empty($mensagem)) {
 $enviado = false;
 
 if (empty($erro)) {
-    $stmt = $conexao->prepare("INSERT INTO mensagens_contato (nome, email, assunto, mensagem) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$nome, $email, $assunto, $mensagem]);
+    $id_inserido = null;
+    try {
+        $stmt = $conexao->prepare("INSERT INTO mensagens_contato (nome, email, assunto, mensagem) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$nome, $email, $assunto, $mensagem]);
+        $id_inserido = $conexao->lastInsertId();
+    } catch (PDOException $e) {
+        error_log("Aviso: tabela mensagens_contato inexistente no banco: " . $e->getMessage());
+    }
 
-    $id_inserido = $conexao->lastInsertId();
+    $destinatarioSuporte = defined('SMTP_TO_ADMIN') && !empty(SMTP_TO_ADMIN) ? SMTP_TO_ADMIN : (defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : '');
 
-    $destinatario = "contato@fixit.com";
-    $titulo = "[Fix it - Contato] " . $assunto;
-    $corpo = "Nova mensagem recebida pelo formulário de contato do site:\n\n" .
-        "Nome: " . $nome . "\n" .
-        "E-mail: " . $email . "\n" .
+    // 1. E-mail para a equipe de Suporte (com os dados completos do contato)
+    $tituloSuporte = "[Fix it - Novo Contato] " . $assunto;
+    $corpoSuporteTexto = "Nova mensagem recebida pelo formulário de contato do site FixIt:\n\n" .
+        "Nome do Cliente: " . $nome . "\n" .
+        "E-mail do Cliente: " . $email . "\n" .
         "Assunto: " . $assunto . "\n\n" .
-        "Mensagem:\n" . $mensagem;
-    $cabecalhos = "From: nao-responder@fixit.com\r\nReply-To: " . $email;
+        "Mensagem:\n" . $mensagem . "\n\n" .
+        "Responda diretamente a este e-mail para contatar o cliente.";
 
-    $enviado = @mail($destinatario, $titulo, $corpo, $cabecalhos);
+    $corpoSuporteHtml = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;'>" .
+        "<h2 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0;'>Novo Contato Recebido - Suporte FixIt</h2>" .
+        "<p><strong>Nome do Cliente:</strong> " . htmlspecialchars($nome) . "</p>" .
+        "<p><strong>E-mail do Cliente:</strong> <a href='mailto:" . htmlspecialchars($email) . "'>" . htmlspecialchars($email) . "</a></p>" .
+        "<p><strong>Assunto:</strong> " . htmlspecialchars($assunto) . "</p>" .
+        "<div style='background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #3498db;'>" .
+        "<p style='margin: 0 0 5px 0;'><strong>Mensagem:</strong></p>" .
+        "<p style='margin: 0; white-space: pre-wrap; color: #444;'>" . htmlspecialchars($mensagem) . "</p>" .
+        "</div>" .
+        "<p style='font-size: 12px; color: #888; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;'>Enviado através do formulário de contato do site FixIt Assistência Técnica.</p>" .
+        "</div>";
 
-    registrarAuditoria($conexao, "CONTATO", "mensagens_contato", $id_inserido, "Mensagem de contato recebida de " . $email . ".");
+    $enviadoSuporte = enviarEmailSmtp($destinatarioSuporte, $tituloSuporte, $corpoSuporteTexto, $email, $nome, $corpoSuporteHtml);
+
+    // 2. E-mail de confirmação para o Usuário (quem preencheu o formulário)
+    $tituloCliente = "Recebemos sua mensagem - FixIt Assistência Técnica";
+    $corpoClienteTexto = "Olá, " . $nome . "!\n\n" .
+        "Confirmamos o recebimento do seu contato através do nosso site.\n" .
+        "Nossa equipe de suporte técnico já recebeu sua mensagem e responderá o mais breve possível por este mesmo e-mail.\n\n" .
+        "Resumo da sua mensagem:\n" .
+        "Assunto: " . $assunto . "\n" .
+        "Mensagem:\n" . $mensagem . "\n\n" .
+        "Atenciosamente,\nEquipe FixIt Assistência Técnica";
+
+    $corpoClienteHtml = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;'>" .
+        "<h2 style='color: #2c3e50; border-bottom: 2px solid #27ae60; padding-bottom: 10px; margin-top: 0;'>FixIt: Confirmação de Contato</h2>" .
+        "<p>Olá, <strong>" . htmlspecialchars($nome) . "</strong>!</p>" .
+        "<p>Confirmamos o recebimento da sua mensagem. Nossa equipe de suporte técnico já está analisando sua solicitação e entrará em contato em breve.</p>" .
+        "<div style='background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #27ae60;'>" .
+        "<p style='margin: 0 0 8px 0;'><strong>Assunto:</strong> " . htmlspecialchars($assunto) . "</p>" .
+        "<p style='margin: 0 0 5px 0;'><strong>Sua Mensagem:</strong></p>" .
+        "<p style='margin: 0; white-space: pre-wrap; color: #555;'>" . htmlspecialchars($mensagem) . "</p>" .
+        "</div>" .
+        "<p style='margin-top: 20px; color: #555;'>Caso queira complementar sua mensagem, você pode responder diretamente a este e-mail.</p>" .
+        "<p style='margin-top: 20px;'>Atenciosamente,<br><strong>Equipe FixIt Assistência Técnica</strong></p>" .
+        "<p style='font-size: 11px; color: #999; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;'>Este é um e-mail automático de confirmação gerado pelo site FixIt Assistência Técnica.</p>" .
+        "</div>";
+
+    $enviadoCliente = enviarEmailSmtp($email, $tituloCliente, $corpoClienteTexto, $destinatarioSuporte, "FixIt Suporte", $corpoClienteHtml);
+
+    $enviado = $enviadoSuporte || $enviadoCliente;
+
+    if ($id_inserido) {
+        registrarAuditoria($conexao, "CONTATO", "mensagens_contato", $id_inserido, "Mensagem de contato recebida de " . $email . ".");
+    } else {
+        registrarAuditoria($conexao, "CONTATO", "contatos", null, "Mensagem de contato recebida de " . $email . ".");
+    }
 }
 ?>
 <!DOCTYPE html>

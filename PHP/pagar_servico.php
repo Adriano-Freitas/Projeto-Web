@@ -2,12 +2,13 @@
 include "conexao.php";
 header("Content-Type: application/json");
 
-if (!isset($_SESSION["clientes"])) {
+$sessaoAtual = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+if (!$sessaoAtual) {
     echo json_encode(array("sucesso" => false, "mensagem" => "Sessão expirada."));
     exit;
 }
 
-$id_cliente = $_SESSION["clientes"]["id"];
+$id_cliente = $sessaoAtual["id"];
 $id_ordem = isset($_POST["id_servico"]) ? (int) $_POST["id_servico"] : 0;
 $forma_pagamento = isset($_POST["forma_pagamento"]) ? $_POST["forma_pagamento"] : "";
 
@@ -18,7 +19,12 @@ if (!in_array($forma_pagamento, $formas_validas)) {
     exit;
 }
 
-$stmt = $conexao->prepare("SELECT valor_total, pago FROM ordens_servico WHERE id = ? AND id_cliente = ?");
+$stmt = $conexao->prepare(
+    "SELECT o.id_ordem, o.valor_total, p.id_pagamento 
+     FROM ordens_servico o 
+     LEFT JOIN pagamentos p ON p.id_ordem = o.id_ordem AND LOWER(p.status) = 'pago'
+     WHERE o.id_ordem = ? AND o.id_cliente = ?"
+);
 $stmt->execute([$id_ordem, $id_cliente]);
 $ordem = $stmt->fetch();
 
@@ -27,16 +33,16 @@ if (!$ordem) {
     exit;
 }
 
-if ((bool) $ordem["pago"]) {
+if (!empty($ordem["id_pagamento"])) {
     echo json_encode(array("sucesso" => false, "mensagem" => "Este serviço já foi pago."));
     exit;
 }
 
-$stmt = $conexao->prepare("UPDATE ordens_servico SET pago = TRUE, forma_pagamento = ? WHERE id = ? AND id_cliente = ?");
-$stmt->execute([$forma_pagamento, $id_ordem, $id_cliente]);
-
-$stmt = $conexao->prepare("INSERT INTO pagamentos (id_ordem, valor, metodo_pagamento) VALUES (?, ?, ?)");
+$stmt = $conexao->prepare("INSERT INTO pagamentos (id_ordem, valor, metodo_pagamento, status, data_pagamento) VALUES (?, ?, ?, 'pago', NOW())");
 $stmt->execute([$id_ordem, $ordem["valor_total"], $forma_pagamento]);
+
+$stmtUpdate = $conexao->prepare("UPDATE ordens_servico SET status = 'Concluído' WHERE id_ordem = ? AND id_cliente = ?");
+$stmtUpdate->execute([$id_ordem, $id_cliente]);
 
 registrarAuditoria($conexao, "PAGAMENTO", "ordens_servico", $id_ordem, "Pagamento da ordem de serviço registrado via " . $forma_pagamento . ".");
 

@@ -288,3 +288,39 @@ footer {
     border-radius: 4px;
     padding: 4px;
 }
+
+/* Imagens responsivas dos servicos */
+.servico {
+    background-color: #16161a;
+    border: 1px solid #2e2e34;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.servico-img {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #333;
+    margin: 12px 0;
+    transition: transform 0.2s ease;
+}
+
+.servico-img:hover {
+    transform: scale(1.01);
+}
+
+.servico-cliente-img {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #333;
+    margin: 10px 0;
+}

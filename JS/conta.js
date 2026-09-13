@@ -357,7 +357,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 ? '<br><button type="button" class="botao-pagar" data-id-servico="' + servico.id + '">Pagar agora</button>'
                 : "";
 
+            var imgHtml = servico.imagem
+                ? '<img src="' + servico.imagem + '" alt="' + servico.nome + '" class="servico-cliente-img">'
+                : "";
+
             item.innerHTML =
+                imgHtml +
                 "<b>Serviço:</b> " + servico.nome + "<br>" +
                 "<b>Data de Abertura:</b> " + servico.data + "<br>" +
                 "<b>Status:</b> <span class='status-badge " + classeBadgeStatus(servico.status) + "'>" + servico.status + "</span><br>" +

@@ -1,21 +1,21 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["clientes"]) || $_SESSION["clientes"]["tipo"] !== "gerente") {
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if (!$sessao || $sessao["tipo"] !== "gerente") {
 		header("Location: index.php");
 		exit;
 	}
 
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 
-	if ($id > 0 && $id !== $_SESSION["clientes"]["id"]) {
-		$stmt = $conexao->prepare("DELETE FROM clientes WHERE id = ?");
-		$stmt->bind_param("i", $id);
-		$stmt->execute();
+	if ($id > 0 && $id !== (int) ($sessao["id"] ?? 0)) {
+		$stmt = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
+		$stmt->execute([$id]);
 
-		registrarAuditoria($conexao, "EXCLUSAO", "clientes", $id, "Gerente excluiu um usuário.");
+		registrarAuditoria($conexao, "EXCLUSAO", "clientes", $id, "Gerente excluiu um cliente.");
 	}
 
-	header("Location: clientes.php");
+	header("Location: usuarios.php");
 	exit;
 ?>

@@ -1,7 +1,8 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
-	if (!isset($_SESSION["clientes"]) || $_SESSION["clientes"]["tipo"] !== "gerente") {
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if (!$sessao || $sessao["tipo"] !== "gerente") {
 		header("Location: index.php");
 		exit;
 	}
@@ -9,9 +10,8 @@
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("DELETE FROM servicos WHERE id = ?");
-		$stmt->bind_param("i", $id);
-		$stmt->execute();
+		$stmt = $conexao->prepare("DELETE FROM servicos WHERE id_servico = ?");
+		$stmt->execute([$id]);
 		registrarAuditoria($conexao, "EXCLUSAO", "servicos", $id, "Serviço excluído do catálogo.");
 	}
 

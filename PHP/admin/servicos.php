@@ -8,8 +8,8 @@
 	}
 
 	$resultado = $conexao->query(
-		"SELECT s.id, s.nome, s.valor_base, s.status, c.nome AS categoria
-		 FROM servicos s INNER JOIN categorias c ON c.id = s.id_categoria
+		"SELECT s.id_servico AS id, s.nome, s.valor_base, s.status, 'Geral' AS categoria
+		 FROM servicos s
 		 ORDER BY s.nome"
 	);
 ?>
@@ -20,7 +20,7 @@
 
 		<table class="tabela-admin">
 			<tr><th>Nome</th><th>Categoria</th><th>Valor Base</th><th>Status</th><th>Ações</th></tr>
-			<?php while ($linha = $resultado->fetch_assoc()) { ?>
+			<?php while ($linha = $resultado->fetch()) { ?>
 				<tr>
 					<td><?php echo htmlspecialchars($linha["nome"]); ?></td>
 					<td><?php echo htmlspecialchars($linha["categoria"]); ?></td>
