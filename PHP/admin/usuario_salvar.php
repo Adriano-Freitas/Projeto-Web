@@ -27,21 +27,26 @@
 		exit;
 	}
 
+	$tipo = isset($_POST["tipo"]) ? trim(strtolower($_POST["tipo"])) : "cliente";
+	if (!in_array($tipo, array("cliente", "tecnico", "gerente"))) {
+		$tipo = "cliente";
+	}
+
 	if ($id > 0) {
 		if (!empty($senha)) {
 			$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, senha=? WHERE id_cliente=?");
-			$stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash, $id]);
+			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, senha=? WHERE id_cliente=?");
+			$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $senha_hash, $id]);
 		} else {
-			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=? WHERE id_cliente=?");
-			$stmt->execute([$nome, $email, $telefone, $cpf, $id]);
+			$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=? WHERE id_cliente=?");
+			$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $id]);
 		}
 
 		registrarAuditoria($conexao, "ATUALIZACAO", "clientes", $id, "Gerente atualizou o cadastro de " . $nome . ".");
 	} else {
 		$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-		$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, senha) VALUES (?, ?, ?, ?, ?) RETURNING id_cliente");
-		$stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash]);
+		$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, senha) VALUES (?, ?, ?, ?, ?, ?) RETURNING id_cliente");
+		$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $senha_hash]);
 		$novoId = $stmt->fetchColumn();
 
 		registrarAuditoria($conexao, "CADASTRO", "clientes", $novoId, "Gerente cadastrou novo cliente: " . $nome . ".");

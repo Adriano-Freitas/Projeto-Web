@@ -11,7 +11,7 @@
 	$clientes = array("id" => 0, "nome" => "", "email" => "", "telefone" => "", "cpf" => "", "tipo" => "cliente", "especialidade" => "", "status" => "Ativo");
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco FROM clientes WHERE id_cliente = ?");
+		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo FROM clientes WHERE id_cliente = ?");
 		$stmt->execute([$id]);
 		$dado = $stmt->fetch();
 		if ($dado) {

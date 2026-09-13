@@ -7,9 +7,9 @@
 		exit;
 	}
 
-	$resultado = $conexao->query("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco FROM clientes ORDER BY nome");
+	$resultado = $conexao->query("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo FROM clientes ORDER BY nome");
 ?>
-	<h2>Gestão de Usuários (Clientes)</h2>
+	<h2>Gestão de Usuários</h2>
 
 	<div class="justificar">
 		<p><a href="usuario_form.php" class="botao">+ Novo Usuário</a></p>
@@ -18,13 +18,16 @@
 			<tr>
 				<th>Nome</th><th>E-mail</th><th>Telefone</th><th>CPF</th><th>Tipo</th><th>Status</th><th>Ações</th>
 			</tr>
-			<?php while ($linha = $resultado->fetch()) { ?>
+			<?php while ($linha = $resultado->fetch()) { 
+				$tipoOriginal = strtolower($linha["tipo"] ?? "cliente");
+				$tipoTexto = $tipoOriginal === "gerente" ? "Gerente" : ($tipoOriginal === "tecnico" ? "Técnico" : "Cliente");
+			?>
 				<tr>
 					<td><?php echo htmlspecialchars($linha["nome"]); ?></td>
 					<td><?php echo htmlspecialchars($linha["email"]); ?></td>
 					<td><?php echo htmlspecialchars($linha["telefone"]); ?></td>
 					<td><?php echo htmlspecialchars($linha["cpf"]); ?></td>
-					<td>Cliente</td>
+					<td><b><?php echo htmlspecialchars($tipoTexto); ?></b></td>
 					<td>Ativo</td>
 					<td>
 						<a href="usuario_form.php?id=<?php echo $linha['id']; ?>">[Editar]</a>
