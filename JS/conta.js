@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var resposta = await buscarDoPHP("verificar_sessao.php");
 
             if (resposta && resposta.logado) {
-                mostrarDashboard(resposta.clientes);
+                mostrarDashboard(resposta.clientes || resposta.usuario);
             } else {
                 mostrarVisitante();
             }
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             formEntrar.reset();
-            mostrarDashboard(resposta.clientes);
+            mostrarDashboard(resposta.clientes || resposta.usuario);
         } catch (erro) {
             erroEntrar.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
             console.error(erro);
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             formRegistrar.reset();
-            mostrarDashboard(resposta.clientes);
+            mostrarDashboard(resposta.clientes || resposta.usuario);
         } catch (erro) {
             erroRegistrar.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
             console.error(erro);
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             var resposta = await buscarDoPHP("verificar_sessao.php");
             if (resposta && resposta.logado) {
-                preencherPerfil(resposta.clientes);
+                preencherPerfil(resposta.clientes || resposta.usuario);
             }
         } catch (erro) {
             console.error(erro);
@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            preencherPerfil(resposta.clientes);
+            preencherPerfil(resposta.clientes || resposta.usuario);
             formPerfil.classList.add("oculto");
             perfilVisualizacao.classList.remove("oculto");
             msgPerfil.textContent = "Dados atualizados com sucesso!";

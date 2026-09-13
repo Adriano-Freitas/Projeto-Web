@@ -10,10 +10,10 @@
     <div class="centralizar">
         <h1>Fix it: Assistência técnica</h1>
         <p>
-            <a href="../index.html">[Início]</a> <a href="../sobre.html">[Sobre]</a>
-            <a href="../servicos.html">[Serviços]</a>
-            <a href="../contatos.html">[Contatos]</a>
-            <a href="../conta.html">[Área cliente]</a>
+            <a href="../index.html">Início</a> <a href="../sobre.html">Sobre</a>
+            <a href="../servicos.html">Serviços</a>
+            <a href="../contatos.html">Contatos</a>
+            <a href="../conta.html">Área cliente</a>
         </p>
     </div>
 
@@ -29,7 +29,7 @@
 
     <h3>Solicitar Serviço</h3>
 
-    <div class="justificar">
+    <div class="cartao">
         <form id="form-solicitacao" data-servico-id="4" action="../../PHP/solicitar_servico.php" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id_servico" value="4">
 
@@ -44,7 +44,7 @@
             <label><b>Qual o problema do aparelho?</b></label><br>
             <textarea id="problema-aparelho" name="problema_aparelho" rows="5" class="form-textarea" required placeholder="Descreva o que aconteceu e quais arquivos você precisa recuperar..."></textarea><br>
 
-            <p class="dica">A retirada e a entrega do equipamento acontecem presencialmente em nossa loja (veja o endereço na página <a href="../contatos.html">Contatos</a>). Não realizamos coleta/entrega no endereço do cliente.</p><br>
+            <p class="dica">A retirada e a entrega do equipamento acontecem presencialmente em nossa loja (veja o endereço na página <a href="../contatos.html">Contatos</a>). Não realizamos coleta/entrega no endereço do cliente.</p>
 
             <label><b>Tipo de Pagamento:</b></label><br>
             <select id="tipo-pagamento" name="tipo_pagamento" class="form-select pagamento" required>
@@ -56,14 +56,14 @@
             </select><br>
 
             <label>Imagens do aparelho (opcional):</label><br>
-            <input type="file" name="imagens[]" class="form-input" accept="image/*" multiple><br><br>
+            <input type="file" name="imagens[]" class="form-input" accept="image/*" multiple><br>
 
             <button type="submit" class="btn-enviar">Enviar Solicitação</button>
         </form>
     </div>
 
     <footer>
-        <h5>Todos os direitos reservados &copy;</h5>
+        <h5>Todos os direitos reservados &copy; Fix it</h5>
     </footer>
 </body>
 </html>
