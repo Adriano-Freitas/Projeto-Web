@@ -153,7 +153,7 @@
 <body>
 	<div class="centralizar">
 		<h1>Fix it: Assistência técnica</h1>
-		<p><a href="../HTML/index.html">[Início]</a> <a href="../HTML/sobre.html">[Sobre]</a> <a href="../HTML/servicos.html">[Serviços]</a> <a href="../HTML/contatos.html">[Contatos]</a> <a href="../HTML/conta.html">[Área cliente]</a></p>
+		<p><a href="../HTML/index.html">[Início]</a> <a href="../HTML/sobre.html">[Sobre]</a> <a href="../HTML/servicos.html">[Serviços]</a> <a href="../HTML/contatos.html">[Contatos]</a> <a href="../HTML/conta.html">[Login]</a></p>
 	</div>
 
 	<h2>Solicitação Enviada</h2>
