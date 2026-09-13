@@ -8,7 +8,7 @@
 		$email = trim($_POST["email"]);
 		$senha = $_POST["senha"];
 
-		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha FROM clientes WHERE email = ?");
+		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, senha, tipo FROM clientes WHERE email = ?");
 		$stmt->execute([$email]);
 		$linha = $stmt->fetch();
 
@@ -22,26 +22,26 @@
 		if (!$linha || !$senhaValida) {
 			$erro = "E-mail ou senha inválidos.";
 		} else {
-			$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE email = ?");
-			$stmtTec->execute([$email]);
-			$isTecnico = (bool) $stmtTec->fetch();
+			$tipo = $linha["tipo"] ?? "cliente";
 
-			$tipo = $isTecnico ? "tecnico" : "gerente";
+			if (!in_array($tipo, array("gerente", "tecnico"))) {
+				$erro = "Acesso negado. Apenas Gerentes e Técnicos podem acessar o Módulo Administrativo.";
+			} else {
+				$_SESSION["clientes"] = array(
+					"id" => (int) $linha["id"],
+					"nome" => $linha["nome"],
+					"email" => $linha["email"],
+					"telefone" => $linha["telefone"] ?? "",
+					"cpf" => $linha["cpf"] ?? "",
+					"tipo" => $tipo
+				);
+				$_SESSION["usuario"] = $_SESSION["clientes"];
 
-			$_SESSION["clientes"] = array(
-				"id" => (int) $linha["id"],
-				"nome" => $linha["nome"],
-				"email" => $linha["email"],
-				"telefone" => $linha["telefone"] ?? "",
-				"cpf" => $linha["cpf"] ?? "",
-				"tipo" => $tipo
-			);
-			$_SESSION["usuario"] = $_SESSION["clientes"];
+				registrarAuditoria($conexao, "LOGIN_ADMIN", "clientes", $linha["id"], "Login no Módulo Administrativo.");
 
-			registrarAuditoria($conexao, "LOGIN_ADMIN", "clientes", $linha["id"], "Login no Módulo Administrativo.");
-
-			header("Location: index.php");
-			exit;
+				header("Location: index.php");
+				exit;
+			}
 		}
 	}
 
