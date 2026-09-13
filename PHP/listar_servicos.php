@@ -18,6 +18,7 @@ $stmt = $conexao->prepare(
         TO_CHAR(o.data_abertura, 'DD/MM/YYYY') AS data, 
         o.status, 
         o.valor_total, 
+        o.descricao_problema,
         CASE WHEN LOWER(p.status) = 'pago' THEN TRUE ELSE FALSE END AS pago, 
         COALESCE(p.metodo_pagamento, '-') AS forma_pagamento
      FROM ordens_servico o
@@ -43,10 +44,18 @@ while ($linha = $stmt->fetch()) {
     $idServico = (int) ($linha["id_servico"] ?? 0);
     $imagemFinal = $mapaImagens[$idServico] ?? "../imagens/servicos/manutencao.svg";
 
-    $arquivosPecas = glob(__DIR__ . "/uploads/pecas/servico" . $idServico . "_*");
-    if (!empty($arquivosPecas)) {
-        $arquivoMaisRecente = end($arquivosPecas);
-        $imagemFinal = "../PHP/uploads/pecas/" . basename($arquivoMaisRecente);
+    if (!empty($linha["descricao_problema"]) && preg_match('/Fotos:\s*([^|]+)/', $linha["descricao_problema"], $matches)) {
+        $fotos = explode(',', trim($matches[1]));
+        $primeira = trim($fotos[0]);
+        if (!empty($primeira)) {
+            $imagemFinal = "../PHP/" . $primeira;
+        }
+    } else {
+        $arquivosPecas = glob(__DIR__ . "/uploads/pecas/servico" . $idServico . "_*");
+        if (!empty($arquivosPecas)) {
+            $arquivoMaisRecente = end($arquivosPecas);
+            $imagemFinal = "../PHP/uploads/pecas/" . basename($arquivoMaisRecente);
+        }
     }
 
     $servicos[] = array(

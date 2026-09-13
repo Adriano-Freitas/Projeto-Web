@@ -28,6 +28,7 @@
 	}
 
 	$enviados = 0;
+	$imagens_enviadas = array();
 	$erros = array();
 
 	if (isset($_FILES["imagens"])) {
@@ -71,12 +72,14 @@
 					imagedestroy($origem);
 					imagedestroy($redimensionada);
 					$enviados++;
+					$imagens_enviadas[] = "uploads/pecas/" . $nome_arquivo;
 					continue;
 				}
 			}
 
 			if (move_uploaded_file($tmp, $pasta_destino . $nome_arquivo)) {
 				$enviados++;
+				$imagens_enviadas[] = "uploads/pecas/" . $nome_arquivo;
 			} else {
 				$erros[] = $nome_original . " - erro ao processar imagem.";
 			}
@@ -111,6 +114,9 @@
 		}
 		if (!empty($especificacoes)) {
 			$descricao_completa .= " | " . $especificacoes;
+		}
+		if (!empty($imagens_enviadas)) {
+			$descricao_completa .= " | Fotos: " . implode(", ", $imagens_enviadas);
 		}
 
 		$id_equipamento = null;
@@ -167,8 +173,18 @@
 			<p><b><?php echo ucfirst(str_replace("_", " ", $campo)); ?>:</b> <?php echo htmlspecialchars($valor); ?></p>
 		<?php } ?>
 
-		<?php if ($enviados > 0) { ?>
-			<p class="sucesso"><?php echo $enviados; ?> imagem(ns) enviada(s) e redimensionada(s) com sucesso.</p>
+		<?php if (!empty($imagens_enviadas)) { ?>
+			<p class="sucesso"><?php echo count($imagens_enviadas); ?> imagem(ns) enviada(s) e redimensionada(s) com sucesso.</p>
+			<div class="bloco-imagens-enviadas" style="margin: 15px 0;">
+				<p><b>Imagem(ns) enviada(s):</b></p>
+				<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+					<?php foreach ($imagens_enviadas as $foto) { ?>
+						<div style="text-align: left;">
+							<img src="<?php echo htmlspecialchars($foto); ?>" alt="Imagem enviada" class="servico-cliente-img" style="max-width: 280px; height: 160px; object-fit: cover; border-radius: 6px; border: 1px solid #444; display: block;">
+						</div>
+					<?php } ?>
+				</div>
+			</div>
 		<?php } ?>
 
 		<?php foreach ($erros as $erro) { ?>
