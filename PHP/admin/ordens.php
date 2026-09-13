@@ -3,7 +3,7 @@
 
 	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
 	if (!$sessao || !in_array($sessao["tipo"], array("gerente", "tecnico"))) {
-		header("Location: index.php");
+		header("Location: ../../HTML/conta.html");
 		exit;
 	}
 

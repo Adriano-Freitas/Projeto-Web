@@ -32,26 +32,12 @@ if ($stmt->fetch()) {
 }
 
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-$tipoPermitidos = array("cliente", "tecnico", "gerente");
-$tipo = isset($_POST["tipo"]) && in_array($_POST["tipo"], $tipoPermitidos) ? $_POST["tipo"] : "cliente";
+$tipo = "cliente";
 
-$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, senha, tipo) VALUES (?, ?, ?, ?, ?, ?) RETURNING id_cliente");
-$stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash, $tipo]);
+$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, senha, tipo) VALUES (?, ?, ?, ?, ?, 'cliente') RETURNING id_cliente");
+$stmt->execute([$nome, $email, $telefone, $cpf, $senha_hash]);
 
 $id_clientes = $stmt->fetchColumn();
-
-if ($tipo === "tecnico") {
-    try {
-        $stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE email = ?");
-        $stmtTec->execute([$email]);
-        if (!$stmtTec->fetch()) {
-            $stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, 'Geral', 'ativo')");
-            $stmtInsTec->execute([$nome, $email, $telefone]);
-        }
-    } catch (PDOException $e) {
-        error_log("Aviso ao sincronizar tecnico: " . $e->getMessage());
-    }
-}
 
 $clientes = array(
     "id" => (int) $id_clientes,

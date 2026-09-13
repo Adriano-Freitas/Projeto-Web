@@ -8,6 +8,6 @@
 	unset($_SESSION["clientes"]);
 	session_destroy();
 
-	header("Location: index.php");
+	header("Location: ../../HTML/conta.html");
 	exit;
 ?>

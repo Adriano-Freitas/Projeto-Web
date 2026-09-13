@@ -88,12 +88,23 @@ document.addEventListener("DOMContentLoaded", function () {
         return "status-andamento";
     }
 
+    function verificarRedirecionamentoAdmin(usuario) {
+        if (usuario && (usuario.tipo === "gerente" || usuario.tipo === "tecnico")) {
+            window.location.href = "../PHP/admin/ordens.php";
+            return true;
+        }
+        return false;
+    }
+
     function mostrarVisitante() {
         areaVisitante.classList.remove("oculto");
         areaDashboard.classList.add("oculto");
     }
 
     function mostrarDashboard(clientes) {
+        if (verificarRedirecionamentoAdmin(clientes)) {
+            return;
+        }
         areaVisitante.classList.add("oculto");
         areaDashboard.classList.remove("oculto");
         preencherPerfil(clientes);
@@ -105,7 +116,11 @@ document.addEventListener("DOMContentLoaded", function () {
             var resposta = await buscarDoPHP("verificar_sessao.php");
 
             if (resposta && resposta.logado) {
-                mostrarDashboard(resposta.clientes || resposta.usuario);
+                var usuarioAtivo = resposta.clientes || resposta.usuario;
+                if (verificarRedirecionamentoAdmin(usuarioAtivo)) {
+                    return;
+                }
+                mostrarDashboard(usuarioAtivo);
             } else {
                 mostrarVisitante();
             }
@@ -204,7 +219,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        var tipo = document.getElementById("reg-tipo") ? document.getElementById("reg-tipo").value : "cliente";
         var botaoEnviar = formRegistrar.querySelector("button[type='submit']");
         botaoEnviar.disabled = true;
 
@@ -214,8 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 email: email,
                 telefone: telefone,
                 cpf: cpf,
-                senha: senha,
-                tipo: tipo
+                senha: senha
             });
 
             if (!resposta.sucesso) {
@@ -239,17 +252,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("ver-email").textContent = clientes.email;
         document.getElementById("ver-telefone").textContent = clientes.telefone;
         document.getElementById("ver-cpf").textContent = clientes.cpf;
-
-        var blocoAdmin = document.getElementById("bloco-acesso-admin");
-        var dashboardTipo = document.getElementById("dashboard-tipo");
-        if (blocoAdmin && dashboardTipo) {
-            if (clientes.tipo === "gerente" || clientes.tipo === "tecnico") {
-                dashboardTipo.textContent = clientes.tipo;
-                blocoAdmin.classList.remove("oculto");
-            } else {
-                blocoAdmin.classList.add("oculto");
-            }
-        }
 
         document.getElementById("perfil-nome").value = clientes.nome;
         document.getElementById("perfil-email").value = clientes.email;
