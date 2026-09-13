@@ -99,6 +99,16 @@ document.addEventListener("DOMContentLoaded", function () {
     function mostrarVisitante() {
         areaVisitante.classList.remove("oculto");
         areaDashboard.classList.add("oculto");
+
+        var menu = document.querySelector(".centralizar p");
+        if (menu) {
+            var authItem = menu.querySelector(".menu-auth");
+            if (authItem) {
+                var spanLogin = document.createElement("span");
+                spanLogin.textContent = "Login";
+                authItem.replaceWith(spanLogin);
+            }
+        }
     }
 
     function mostrarDashboard(clientes) {
@@ -109,6 +119,18 @@ document.addEventListener("DOMContentLoaded", function () {
         areaDashboard.classList.remove("oculto");
         preencherPerfil(clientes);
         carregarServicos();
+
+        var menu = document.querySelector(".centralizar p");
+        if (menu && clientes && clientes.nome) {
+            var primeiroNome = clientes.nome.split(" ")[0];
+            var itemLogin = menu.querySelector(".menu-auth, span:last-child, a[href*='conta.html']");
+            if (itemLogin) {
+                var containerAuth = document.createElement("span");
+                containerAuth.className = "menu-auth";
+                containerAuth.innerHTML = '<a href="./conta.html">Olá, ' + primeiroNome + '</a> <a href="../PHP/logout.php" class="link-sair-menu">[Sair]</a>';
+                itemLogin.replaceWith(containerAuth);
+            }
+        }
     }
 
     async function iniciarPagina() {
@@ -479,9 +501,14 @@ document.addEventListener("DOMContentLoaded", function () {
         painelPagamento.classList.add("oculto");
         painelServicos.classList.add("oculto");
         painelPerfil.classList.remove("oculto");
-        abaPerfil.classList.add("ativa");
-        abaServicos.classList.remove("ativa");
         mostrarVisitante();
+    });
+
+    document.addEventListener("click", function (evento) {
+        if (evento.target && evento.target.classList && evento.target.classList.contains("link-sair-menu")) {
+            evento.preventDefault();
+            botaoSair.click();
+        }
     });
 
     iniciarPagina();
