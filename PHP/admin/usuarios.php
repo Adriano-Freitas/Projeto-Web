@@ -7,7 +7,7 @@
 		exit;
 	}
 
-	$resultado = $conexao->query("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo FROM clientes ORDER BY nome");
+	$resultado = $conexao->query("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo, especialidade FROM clientes ORDER BY nome");
 ?>
 	<h2>Gestão de Usuários</h2>
 
@@ -20,7 +20,8 @@
 			</tr>
 			<?php while ($linha = $resultado->fetch()) { 
 				$tipoOriginal = strtolower($linha["tipo"] ?? "cliente");
-				$tipoTexto = $tipoOriginal === "gerente" ? "Gerente" : ($tipoOriginal === "tecnico" ? "Técnico" : "Cliente");
+				$esp = (!empty($linha["especialidade"]) && $tipoOriginal === "tecnico") ? " (" . $linha["especialidade"] . ")" : "";
+				$tipoTexto = $tipoOriginal === "gerente" ? "Gerente" : ($tipoOriginal === "tecnico" ? ("Técnico" . $esp) : "Cliente");
 			?>
 				<tr>
 					<td><?php echo htmlspecialchars($linha["nome"]); ?></td>

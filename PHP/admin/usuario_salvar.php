@@ -50,26 +50,33 @@
 		$tipo = "cliente";
 	}
 
+	$especialidade = ($tipo === "tecnico") ? trim($_POST["especialidade"] ?? "Manutenção Geral") : null;
+	if ($tipo === "tecnico" && empty($especialidade)) {
+		$especialidade = "Manutenção Geral";
+	}
+
 	try {
 		if ($id > 0) {
+			$stmtAntigo = $conexao->prepare("SELECT email FROM clientes WHERE id_cliente = ?");
+			$stmtAntigo->execute([$id]);
+			$emailAntigo = $stmtAntigo->fetchColumn() ?: $email;
+
 			if (!empty($senha)) {
 				$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, senha=? WHERE id_cliente=?");
-				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $senha_hash, $id]);
+				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=?, senha=? WHERE id_cliente=?");
+				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $senha_hash, $id]);
 			} else {
-				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=? WHERE id_cliente=?");
-				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $id]);
+				$stmt = $conexao->prepare("UPDATE clientes SET nome=?, email=?, telefone=?, cpf=?, tipo=?, especialidade=? WHERE id_cliente=?");
+				$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $id]);
 			}
 
 			if ($tipo === "tecnico") {
-				$especialidade = trim($_POST["especialidade"] ?? "Geral");
-				if (empty($especialidade)) $especialidade = "Geral";
-				$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE email = ?");
-				$stmtTec->execute([$email]);
+				$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE LOWER(email) = ? OR LOWER(email) = ?");
+				$stmtTec->execute([strtolower($emailAntigo), strtolower($email)]);
 				$idTec = $stmtTec->fetchColumn();
 				if ($idTec) {
-					$stmtUpTec = $conexao->prepare("UPDATE tecnicos SET nome=?, telefone=?, especialidade=? WHERE id_tecnico=?");
-					$stmtUpTec->execute([$nome, $telefone, $especialidade, $idTec]);
+					$stmtUpTec = $conexao->prepare("UPDATE tecnicos SET nome=?, email=?, telefone=?, especialidade=? WHERE id_tecnico=?");
+					$stmtUpTec->execute([$nome, $email, $telefone, $especialidade, $idTec]);
 				} else {
 					$stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, ?, 'ativo')");
 					$stmtInsTec->execute([$nome, $email, $telefone, $especialidade]);
@@ -81,13 +88,11 @@
 			$_SESSION["alerta_mensagem"] = "Usuário " . $nome . " atualizado com sucesso.";
 		} else {
 			$senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-			$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, senha) VALUES (?, ?, ?, ?, ?, ?) RETURNING id_cliente");
-			$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $senha_hash]);
+			$stmt = $conexao->prepare("INSERT INTO clientes (nome, email, telefone, cpf, tipo, especialidade, senha) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id_cliente");
+			$stmt->execute([$nome, $email, $telefone, $cpf, $tipo, $especialidade, $senha_hash]);
 			$novoId = $stmt->fetchColumn();
 
 			if ($tipo === "tecnico") {
-				$especialidade = trim($_POST["especialidade"] ?? "Geral");
-				if (empty($especialidade)) $especialidade = "Geral";
 				$stmtInsTec = $conexao->prepare("INSERT INTO tecnicos (nome, email, telefone, especialidade, status) VALUES (?, ?, ?, ?, 'ativo')");
 				$stmtInsTec->execute([$nome, $email, $telefone, $especialidade]);
 			}

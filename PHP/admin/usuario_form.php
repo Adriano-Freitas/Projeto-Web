@@ -11,11 +11,16 @@
 	$clientes = array("id" => 0, "nome" => "", "email" => "", "telefone" => "", "cpf" => "", "tipo" => "cliente", "especialidade" => "", "status" => "Ativo");
 
 	if ($id > 0) {
-		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo FROM clientes WHERE id_cliente = ?");
+		$stmt = $conexao->prepare("SELECT id_cliente AS id, nome, email, telefone, cpf, endereco, tipo, especialidade FROM clientes WHERE id_cliente = ?");
 		$stmt->execute([$id]);
 		$dado = $stmt->fetch();
 		if ($dado) {
 			$clientes = array_merge($clientes, $dado);
+			if (empty($clientes["especialidade"]) && strtolower($clientes["tipo"] ?? "") === "tecnico") {
+				$stmtTec = $conexao->prepare("SELECT especialidade FROM tecnicos WHERE email = ?");
+				$stmtTec->execute([$clientes["email"]]);
+				$clientes["especialidade"] = $stmtTec->fetchColumn() ?: "";
+			}
 		}
 	}
 ?>
@@ -38,14 +43,16 @@
 			<input type="text" name="cpf" id="cpf" maxlength="14" required value="<?php echo htmlspecialchars($clientes["cpf"]); ?>" placeholder="000.000.000-00"><br>
 
 			<label><b>Tipo:</b></label><br>
-			<select name="tipo" required>
+			<select name="tipo" id="tipo-usuario" required>
 				<option value="cliente" <?php echo $clientes["tipo"] === "cliente" ? "selected" : ""; ?>>Cliente</option>
 				<option value="tecnico" <?php echo $clientes["tipo"] === "tecnico" ? "selected" : ""; ?>>Técnico</option>
 				<option value="gerente" <?php echo $clientes["tipo"] === "gerente" ? "selected" : ""; ?>>Gerente</option>
 			</select><br>
 
-			<label><b>Especialidade (para Técnico):</b></label><br>
-			<input type="text" name="especialidade" value="<?php echo htmlspecialchars($clientes["especialidade"] ?? ""); ?>"><br>
+			<div id="grupo-especialidade" style="<?php echo $clientes["tipo"] === "tecnico" ? "" : "display:none;"; ?>">
+				<label><b>Especialidade:</b></label><br>
+				<input type="text" name="especialidade" id="especialidade" value="<?php echo htmlspecialchars($clientes["especialidade"] ?? ""); ?>" placeholder="Ex: Notebooks, Computadores, Celulares"><br>
+			</div>
 
 			<label><b>Status:</b></label><br>
 			<select name="status">
@@ -65,6 +72,14 @@
 		document.addEventListener("DOMContentLoaded", function() {
 			var telInput = document.getElementById("telefone");
 			var cpfInput = document.getElementById("cpf");
+			var tipoSelect = document.getElementById("tipo-usuario");
+			var grupoEsp = document.getElementById("grupo-especialidade");
+
+			if (tipoSelect && grupoEsp) {
+				tipoSelect.addEventListener("change", function() {
+					grupoEsp.style.display = (this.value === "tecnico") ? "block" : "none";
+				});
+			}
 
 			function aplicarMascaraTelefone(v) {
 				v = v.replace(/\D/g, "");
