@@ -1,5 +1,11 @@
 <?php
-	include "header.php";
+	include __DIR__ . "/../conexao.php";
+
+	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
+	if (!$sessao || !in_array($sessao["tipo"], array("gerente", "tecnico"))) {
+		header("Location: index.php");
+		exit;
+	}
 
 	// RF09 - Controlar o Status do Serviço (iniciar/atualizar/encerrar).
 	// Visível para Técnico e Gerente.
@@ -21,6 +27,8 @@
 		header("Location: ordens.php");
 		exit;
 	}
+
+	include "header.php";
 
 	$resultado = $conexao->query(
 		"SELECT 
