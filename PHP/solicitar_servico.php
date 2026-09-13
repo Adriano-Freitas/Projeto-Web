@@ -1,5 +1,4 @@
 <?php
-	// UC02 (RF05) - Abertura de Ordem de Serviço.
 	include "conexao.php";
 
 	if (!isset($_SESSION["clientes"])) {
@@ -86,10 +85,6 @@
 		}
 	}
 
-	// RF07 - o orçamento inicial é calculado automaticamente com base no
-	// valor_base cadastrado no catálogo de serviços (Gerenciar Catálogo -
-	// RF04). O valor final só é confirmado após o relatório de gastos do
-	// Técnico e a fatura (ver UC03 na especificação de requisitos).
 	$stmt = $conexao->prepare("SELECT nome, valor_base FROM servicos WHERE id_servico = ? AND LOWER(status) = 'ativo'");
 	$stmt->execute([$id_servico]);
 	$servico = $stmt->fetch();

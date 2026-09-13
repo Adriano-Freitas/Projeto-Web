@@ -7,8 +7,6 @@
 		exit;
 	}
 
-	// RF09 - Controlar o Status do Serviço (iniciar/atualizar/encerrar).
-	// Visível para Técnico e Gerente.
 	if (isset($_POST["atualizar_status"])) {
 		$id_ordem = (int) $_POST["id_ordem"];
 		$novo_status = $_POST["status"];

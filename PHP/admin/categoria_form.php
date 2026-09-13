@@ -19,7 +19,6 @@
 				$categoria = $dado;
 			}
 		} catch (PDOException $e) {
-			// Tabela não existe no banco
 		}
 	}
 ?>

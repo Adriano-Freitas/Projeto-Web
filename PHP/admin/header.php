@@ -1,6 +1,4 @@
 <?php
-	// Cabeçalho comum do Módulo Administrativo (CMS) - Inclusão de
-	// Arquivos (cabeçalho/rodapé) e controle de acesso por sessão (RF10).
 	include __DIR__ . "/../conexao.php";
 
 	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;

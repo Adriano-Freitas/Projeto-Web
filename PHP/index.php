@@ -1,24 +1,16 @@
 <?php
-// 1. Dados de acesso fornecidos pelo Neon.tech
-$host     = "ep-aged-term-ac4575sp-pooler.sa-east-1.aws.neon.tech"; 
-$port     = "5432";
-$dbname   = "assistencia";
-$user     = "neondb_owner";
-$password = "npg_gSTtM8h2uFLE";
+require_once __DIR__ . '/config.php';
 
-// 2. Monta a string de conexão CORRETA exigindo o banco e o SSL
-$dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
+$sslMode = (DB_HOST === 'localhost' || DB_HOST === '127.0.0.1') ? '' : ';sslmode=require';
+$dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . $sslMode;
 
 try {
-    // 3. Tenta conectar usando o PDO do PHP
-    $pdo = new PDO($dsn, $user, $password, [
+    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
     
-    echo "<h1>Conexão com o Neon.tech realizada com sucesso!</h1>";
-
-    // 4. Teste rápido: Listando as tabelas do seu banco para provar que conectou
-    echo "<h3>Suas tabelas no banco:</h3>";
+    echo "<h1>Conexão com o banco realizada com sucesso!</h1>";
+    echo "<h3>Tabelas no banco:</h3>";
     $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'");
     
     echo "<ul>";
@@ -28,7 +20,6 @@ try {
     echo "</ul>";
 
 } catch (PDOException $e) {
-    // Se der qualquer erro (senha errada, host incorreto), exibe aqui
     echo "<h1>Erro ao conectar:</h1>";
     echo "<p>" . $e->getMessage() . "</p>";
 }

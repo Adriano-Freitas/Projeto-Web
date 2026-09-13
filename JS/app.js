@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 1) Validação de formulários
   document.querySelectorAll('form[data-validar]').forEach(form => {
     form.addEventListener('submit', e => {
       let ok = true;
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 2) Painéis recolhíveis
   document.querySelectorAll('.faq button').forEach(btn => {
     btn.addEventListener('click', () => {
       const panel = btn.nextElementSibling;
@@ -21,14 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 3) Slideshow
   const slides = [...document.querySelectorAll('.slide')];
   if (slides.length) {
     let i = 0; slides[0].classList.add('ativo');
     setInterval(() => { slides[i].classList.remove('ativo'); i=(i+1)%slides.length; slides[i].classList.add('ativo'); }, 3500);
   }
 
-  // 4) Ordenação dos serviços
   const select = document.querySelector('#ordenar-servicos'), list = document.querySelector('#lista-servicos');
   if (select && list) {
     select.addEventListener('change', () => {
@@ -40,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Confirmação para exclusões
   document.querySelectorAll('form[data-confirmar]').forEach(f => f.addEventListener('submit', e => {
     if (!confirm(f.dataset.confirmar)) e.preventDefault();
   }));

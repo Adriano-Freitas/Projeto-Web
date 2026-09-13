@@ -1,10 +1,4 @@
 <?php
-/**
- * Modulo de envio de e-mails via SMTP autenticado (compativel com Brevo, Gmail, SendGrid, etc.).
- * Implementado em PHP puro via sockets com suporte a STARTTLS (porta 587) e SSL (porta 465).
- * Suporta envio em texto simples ou multipart/alternative (Texto + HTML).
- */
-
 if (!function_exists('enviarEmailSmtp')) {
     function enviarEmailSmtp($destinatario, $assunto, $mensagemTexto, $replyToEmail = null, $replyToNome = null, $mensagemHtml = null) {
         $host = defined('SMTP_HOST') ? SMTP_HOST : (getenv('SMTP_HOST') ?: ($_ENV['SMTP_HOST'] ?? ''));
@@ -14,7 +8,6 @@ if (!function_exists('enviarEmailSmtp')) {
         $fromEmail = defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : (getenv('SMTP_FROM_EMAIL') ?: ($_ENV['SMTP_FROM_EMAIL'] ?? ''));
         $fromNome = defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : (getenv('SMTP_FROM_NAME') ?: ($_ENV['SMTP_FROM_NAME'] ?? 'FixIt Assistencia'));
 
-        // Se faltar configuracao de SMTP, tenta fallback nativo mail()
         if (empty($host) || empty($user) || empty($pass) || empty($fromEmail)) {
             $cabecalhos = "From: " . ($fromEmail ?: 'nao-responder@fixit.com') . "\r\n";
             if (!empty($replyToEmail)) {
@@ -30,7 +23,6 @@ if (!function_exists('enviarEmailSmtp')) {
             }
         }
 
-        // tls: rejectUnauthorized = false (semelhante ao NestJS)
         $contexto = stream_context_create([
             'ssl' => [
                 'verify_peer' => false,
@@ -64,7 +56,6 @@ if (!function_exists('enviarEmailSmtp')) {
             fputs($socket, $comando . "\r\n");
         };
 
-        // Handshake
         $resp = $lerResposta($socket);
         if (substr($resp, 0, 3) !== '220') {
             error_log("SMTP Erro handshake: " . trim($resp));
@@ -72,7 +63,6 @@ if (!function_exists('enviarEmailSmtp')) {
             return false;
         }
 
-        // EHLO
         $enviarComando($socket, 'EHLO localhost');
         $resp = $lerResposta($socket);
         if (substr($resp, 0, 3) !== '250') {
@@ -81,7 +71,6 @@ if (!function_exists('enviarEmailSmtp')) {
             return false;
         }
 
-        // STARTTLS
         if ($port != 465 && strpos($resp, 'STARTTLS') !== false) {
             $enviarComando($socket, 'STARTTLS');
             $resp = $lerResposta($socket);
@@ -102,7 +91,6 @@ if (!function_exists('enviarEmailSmtp')) {
             }
         }
 
-        // AUTH LOGIN
         $enviarComando($socket, 'AUTH LOGIN');
         $resp = $lerResposta($socket);
         if (substr($resp, 0, 3) !== '334') {
@@ -127,7 +115,6 @@ if (!function_exists('enviarEmailSmtp')) {
             return false;
         }
 
-        // MAIL FROM
         $enviarComando($socket, "MAIL FROM:<{$fromEmail}>");
         $resp = $lerResposta($socket);
         if (substr($resp, 0, 3) !== '250') {
@@ -136,7 +123,6 @@ if (!function_exists('enviarEmailSmtp')) {
             return false;
         }
 
-        // RCPT TO
         $enviarComando($socket, "RCPT TO:<{$destinatario}>");
         $resp = $lerResposta($socket);
         if (substr($resp, 0, 3) !== '250') {
@@ -145,7 +131,6 @@ if (!function_exists('enviarEmailSmtp')) {
             return false;
         }
 
-        // DATA
         $enviarComando($socket, 'DATA');
         $resp = $lerResposta($socket);
         if (substr($resp, 0, 3) !== '354') {
@@ -184,7 +169,6 @@ if (!function_exists('enviarEmailSmtp')) {
         $headers[] = "X-Mailer: FixIt-Mailer-PHP";
         $headers[] = "MIME-Version: 1.0";
 
-        // Dot-stuffing e normalizacao de quebras de linha
         $formatarLinhas = function($texto) {
             $norm = str_replace(["\r\n", "\r"], "\n", $texto);
             $linhas = explode("\n", $norm);

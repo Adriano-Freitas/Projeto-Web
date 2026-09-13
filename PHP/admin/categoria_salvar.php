@@ -22,7 +22,6 @@
 			registrarAuditoria($conexao, "CADASTRO", "categorias", $novoId, "Nova categoria cadastrada: " . $nome . ".");
 		}
 	} catch (PDOException $e) {
-		// Tabela não existe no banco
 	}
 
 	header("Location: categorias.php");

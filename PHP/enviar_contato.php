@@ -27,8 +27,6 @@ if (empty($erro)) {
     }
 
     $destinatarioSuporte = defined('SMTP_TO_ADMIN') && !empty(SMTP_TO_ADMIN) ? SMTP_TO_ADMIN : (defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : '');
-
-    // 1. E-mail para a equipe de Suporte (com os dados completos do contato)
     $tituloSuporte = "[Fix it - Novo Contato] " . $assunto;
     $corpoSuporteTexto = "Nova mensagem recebida pelo formulário de contato do site FixIt:\n\n" .
         "Nome do Cliente: " . $nome . "\n" .
@@ -51,7 +49,6 @@ if (empty($erro)) {
 
     $enviadoSuporte = enviarEmailSmtp($destinatarioSuporte, $tituloSuporte, $corpoSuporteTexto, $email, $nome, $corpoSuporteHtml);
 
-    // 2. E-mail de confirmação para o Usuário (quem preencheu o formulário)
     $tituloCliente = "Recebemos sua mensagem - FixIt Assistência Técnica";
     $corpoClienteTexto = "Olá, " . $nome . "!\n\n" .
         "Confirmamos o recebimento do seu contato através do nosso site.\n" .

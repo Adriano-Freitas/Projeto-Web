@@ -15,7 +15,6 @@
 			$stmt->execute([$id]);
 			registrarAuditoria($conexao, "EXCLUSAO", "categorias", $id, "Categoria excluída.");
 		} catch (PDOException $e) {
-			// Tabela não existe
 		}
 	}
 

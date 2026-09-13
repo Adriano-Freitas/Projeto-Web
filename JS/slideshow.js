@@ -1,7 +1,3 @@
-/**
- * Fix it - Modulo de Slideshow Interativo (JavaScript)
- * Atende ao criterio de 'Animacao Slideshow' do barema de Programacao Web.
- */
 document.addEventListener("DOMContentLoaded", function () {
     var container = document.querySelector(".slideshow-container");
     if (!container) return;
@@ -15,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var indiceAtual = 0;
     var totalSlides = slides.length;
-    var intervaloTempo = 4000; // 4 segundos
+    var intervaloTempo = 4000;
     var temporizador = null;
 
     function mostrarSlide(indice) {
@@ -64,7 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Controles de clique nos botoes
     if (btnNext) {
         btnNext.addEventListener("click", function () {
             proximoSlide();
@@ -79,7 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Controles nos indicadores (dots)
     dots.forEach(function (dot, index) {
         dot.addEventListener("click", function () {
             mostrarSlide(index);
@@ -87,11 +81,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Pausar autoplay quando o mouse estiver sobre o carrossel
     container.addEventListener("mouseenter", pararAutoplay);
     container.addEventListener("mouseleave", iniciarAutoplay);
 
-    // Navegacao pelo teclado (setas esquerda/direita)
     container.setAttribute("tabindex", "0");
     container.addEventListener("keydown", function (evento) {
         if (evento.key === "ArrowLeft") {
@@ -103,7 +95,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Iniciar exibicao
     mostrarSlide(0);
     iniciarAutoplay();
 });

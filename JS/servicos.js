@@ -1,7 +1,3 @@
-/**
- * Fix it - Modulo de Ordenacao Dinamica de Elementos (JavaScript)
- * Atende ao criterio de 'Ordenacao de elementos' do barema de Programacao Web.
- */
 document.addEventListener("DOMContentLoaded", function () {
     var selectOrdenacao = document.getElementById("ordenar-servicos");
     var listaServicos = document.getElementById("lista-servicos");
@@ -9,14 +5,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!listaServicos) return;
 
-    // Guarda a lista inicial original para poder restaurar a ordem padrao
     var itensOriginais = Array.from(listaServicos.querySelectorAll("li.servico"));
 
     function ordenarLista(criterio) {
         var itens = Array.from(listaServicos.querySelectorAll("li.servico"));
 
         if (criterio === "padrao") {
-            // Restaura a ordem original pelo id ou posicao inicial
             itensOriginais.forEach(function (item) {
                 listaServicos.appendChild(item);
             });
@@ -35,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return 0;
         });
 
-        // Reanexa os itens ordenados ao DOM com efeito visual
         itens.forEach(function (item) {
             listaServicos.appendChild(item);
         });
@@ -47,7 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Filtro instantaneo por texto de pesquisa (bonus de usabilidade)
     if (inputBusca) {
         inputBusca.addEventListener("input", function () {
             var termo = this.value.trim().toLowerCase();
