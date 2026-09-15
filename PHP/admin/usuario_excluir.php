@@ -1,143 +1,87 @@
 <?php
 	include __DIR__ . "/../conexao.php";
 
+	$conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+	function logDebug(string $msg): void {
+		$linha = "[" . date("Y-m-d H:i:s") . "] [EXCLUIR] " . $msg;
+		error_log($linha);
+
+		// STDERR só existe nativamente no PHP CLI. Rodando via Apache/PHP-FPM
+		// (SAPI web) precisamos abrir o stream manualmente.
+		static $stderr = null;
+		if ($stderr === null) {
+			$stderr = @fopen('php://stderr', 'a');
+		}
+		if ($stderr) {
+			fwrite($stderr, $linha . PHP_EOL);
+		}
+	}
+
 	$sessao = $_SESSION["clientes"] ?? $_SESSION["usuario"] ?? null;
 	if (!$sessao || $sessao["tipo"] !== "gerente") {
 		header("Location: index.php");
 		exit;
 	}
 
-	function excluirDependenciasCliente(PDO $conexao, int $idCliente): void {
-		$stmtOrdens = $conexao->prepare("SELECT id_ordem FROM ordens_servico WHERE id_cliente = ?");
-		$stmtOrdens->execute([$idCliente]);
-		$ordensIds = $stmtOrdens->fetchAll(PDO::FETCH_COLUMN);
-
-		if (!empty($ordensIds)) {
-			$placeholders = implode(",", array_fill(0, count($ordensIds), "?"));
-
-			$stmtDelPag = $conexao->prepare("DELETE FROM pagamentos WHERE id_ordem IN ($placeholders)");
-			$stmtDelPag->execute($ordensIds);
-
-			$stmtDelOss = $conexao->prepare("DELETE FROM ordem_servico_servicos WHERE id_ordem IN ($placeholders)");
-			$stmtDelOss->execute($ordensIds);
-
-			$stmtDelOrdens = $conexao->prepare("DELETE FROM ordens_servico WHERE id_ordem IN ($placeholders)");
-			$stmtDelOrdens->execute($ordensIds);
-		}
-
-		$stmtDelEquip = $conexao->prepare("DELETE FROM equipamentos WHERE id_cliente = ?");
-		$stmtDelEquip->execute([$idCliente]);
-	}
-
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 	$id_tecnico = isset($_GET["id_tecnico"]) ? (int) $_GET["id_tecnico"] : 0;
 	$origem = isset($_GET["origem"]) && $_GET["origem"] === "tecnicos" ? "tecnicos.php" : "usuarios.php";
 
+	logDebug("GET recebido -> " . print_r($_GET, true));
+	logDebug("id=[{$id}] id_tecnico=[{$id_tecnico}] sessao_id=[" . ($sessao["id"] ?? "NULO") . "]");
+
 	if ($id_tecnico > 0) {
 		try {
-			$conexao->beginTransaction();
+			logDebug("Rodando DELETE simples em tecnicos WHERE id_tecnico = {$id_tecnico}");
+			$stmt = $conexao->prepare("DELETE FROM tecnicos WHERE id_tecnico = ?");
+			$stmt->execute([$id_tecnico]);
+			logDebug("rowCount = " . $stmt->rowCount());
 
-			$stmtTec = $conexao->prepare("SELECT nome, email FROM tecnicos WHERE id_tecnico = ?");
-			$stmtTec->execute([$id_tecnico]);
-			$tec = $stmtTec->fetch();
-
-			if (!$tec) {
-				throw new RuntimeException("Técnico não encontrado ou já excluído.");
+			if ($stmt->rowCount() === 0) {
+				$_SESSION["alerta_tipo"] = "erro";
+				$_SESSION["alerta_mensagem"] = "Técnico não encontrado ou já excluído (id={$id_tecnico}).";
+			} else {
+				$_SESSION["alerta_tipo"] = "exclusao";
+				$_SESSION["alerta_mensagem"] = "Técnico excluído com sucesso.";
 			}
-
-			$nomeTec = $tec["nome"] ?? "Técnico #" . $id_tecnico;
-
-			$stmtUnsetTec = $conexao->prepare("UPDATE ordens_servico SET id_tecnico = NULL WHERE id_tecnico = ?");
-			$stmtUnsetTec->execute([$id_tecnico]);
-
-			$stmtDelTec = $conexao->prepare("DELETE FROM tecnicos WHERE id_tecnico = ?");
-			$stmtDelTec->execute([$id_tecnico]);
-
-			if ($stmtDelTec->rowCount() === 0) {
-				throw new RuntimeException("Técnico não encontrado ou já excluído.");
-			}
-
-			if (!empty($tec["email"])) {
-				$stmtC = $conexao->prepare("SELECT id_cliente FROM clientes WHERE LOWER(email) = ?");
-				$stmtC->execute([strtolower($tec["email"])]);
-				$idCli = (int) ($stmtC->fetchColumn() ?: 0);
-				if ($idCli > 0 && $idCli !== (int) ($sessao["id"] ?? 0)) {
-					excluirDependenciasCliente($conexao, $idCli);
-
-					$stmtDelCli = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
-					$stmtDelCli->execute([$idCli]);
-
-					if ($stmtDelCli->rowCount() === 0) {
-						throw new RuntimeException("Usuário vinculado ao técnico não foi excluído.");
-					}
-				}
-			}
-
-			registrarAuditoria($conexao, "EXCLUSAO", "tecnicos", $id_tecnico, "Gerente excluiu o técnico " . $nomeTec . ".");
-
-			$conexao->commit();
-			$_SESSION["alerta_tipo"] = "exclusao";
-			$_SESSION["alerta_mensagem"] = "Técnico " . $nomeTec . " excluído com sucesso.";
-		} catch (Exception $e) {
-			if ($conexao->inTransaction()) {
-				$conexao->rollBack();
-			}
+		} catch (PDOException $e) {
+			logDebug("ERRO PDO: " . $e->getMessage());
+			logDebug("errorInfo: " . print_r($e->errorInfo ?? [], true));
 			$_SESSION["alerta_tipo"] = "erro";
 			$_SESSION["alerta_mensagem"] = "Erro ao excluir o técnico: " . $e->getMessage();
 		}
-	} else if ($id > 0 && $id !== (int) ($sessao["id"] ?? 0)) {
-		try {
-			$conexao->beginTransaction();
-
-			$stmtCliente = $conexao->prepare("SELECT nome, email FROM clientes WHERE id_cliente = ?");
-			$stmtCliente->execute([$id]);
-			$clienteInfo = $stmtCliente->fetch();
-
-			if (!$clienteInfo) {
-				throw new RuntimeException("Usuário não encontrado ou já excluído.");
-			}
-
-			$nomeCliente = $clienteInfo["nome"] ?? "ID " . $id;
-
-			excluirDependenciasCliente($conexao, $id);
-
-			if (!empty($clienteInfo["email"])) {
-				$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE LOWER(email) = ?");
-				$stmtTec->execute([strtolower($clienteInfo["email"])]);
-				$tecnicosIds = $stmtTec->fetchAll(PDO::FETCH_COLUMN);
-				foreach ($tecnicosIds as $idTec) {
-					$stmtUnsetTec = $conexao->prepare("UPDATE ordens_servico SET id_tecnico = NULL WHERE id_tecnico = ?");
-					$stmtUnsetTec->execute([$idTec]);
-
-					$stmtDelTec = $conexao->prepare("DELETE FROM tecnicos WHERE id_tecnico = ?");
-					$stmtDelTec->execute([$idTec]);
-				}
-			}
-
-			$stmt = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
-			$stmt->execute([$id]);
-
-			if ($stmt->rowCount() === 0) {
-				throw new RuntimeException("Usuário não encontrado ou já excluído.");
-			}
-
-			registrarAuditoria($conexao, "EXCLUSAO", "clientes", $id, "Gerente excluiu o usuário " . $nomeCliente . ".");
-
-			$conexao->commit();
-			$_SESSION["alerta_tipo"] = "exclusao";
-			$_SESSION["alerta_mensagem"] = "Usuário " . $nomeCliente . " excluído com sucesso.";
-		} catch (Exception $e) {
-			if ($conexao->inTransaction()) {
-				$conexao->rollBack();
-			}
+	} else if ($id > 0) {
+		if ($id === (int) ($sessao["id"] ?? 0)) {
+			logDebug("Bloqueado: tentando excluir o proprio id da sessao.");
 			$_SESSION["alerta_tipo"] = "erro";
-			$_SESSION["alerta_mensagem"] = "Erro ao excluir o usuário: " . $e->getMessage();
+			$_SESSION["alerta_mensagem"] = "Não é permitido excluir o usuário que está logado atualmente.";
+		} else {
+			try {
+				logDebug("Rodando DELETE simples em clientes WHERE id_cliente = {$id}");
+				$stmt = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
+				$stmt->execute([$id]);
+				logDebug("rowCount = " . $stmt->rowCount());
+
+				if ($stmt->rowCount() === 0) {
+					$_SESSION["alerta_tipo"] = "erro";
+					$_SESSION["alerta_mensagem"] = "Usuário não encontrado ou já excluído (id={$id}).";
+				} else {
+					$_SESSION["alerta_tipo"] = "exclusao";
+					$_SESSION["alerta_mensagem"] = "Usuário excluído com sucesso.";
+				}
+			} catch (PDOException $e) {
+				logDebug("ERRO PDO: " . $e->getMessage());
+				logDebug("errorInfo: " . print_r($e->errorInfo ?? [], true));
+				$_SESSION["alerta_tipo"] = "erro";
+				$_SESSION["alerta_mensagem"] = "Erro ao excluir o usuário: " . $e->getMessage();
+			}
 		}
-	} else if ($id === (int) ($sessao["id"] ?? 0)) {
+	} else {
+		logDebug("Nenhum id valido recebido (id=0 e id_tecnico=0). Nada foi executado.");
 		$_SESSION["alerta_tipo"] = "erro";
-		$_SESSION["alerta_mensagem"] = "Não é permitido excluir o usuário que está logado atualmente.";
+		$_SESSION["alerta_mensagem"] = "ID inválido ou não informado.";
 	}
 
 	header("Location: " . $origem);
 	exit;
-?>
