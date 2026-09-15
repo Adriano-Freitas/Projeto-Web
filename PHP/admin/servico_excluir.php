@@ -13,10 +13,25 @@
 		try {
 			$stmtNome = $conexao->prepare("SELECT nome FROM servicos WHERE id_servico = ?");
 			$stmtNome->execute([$id]);
-			$nomeServico = $stmtNome->fetchColumn() ?: "ID " . $id;
+			$nomeServico = $stmtNome->fetchColumn();
+
+			if (!$nomeServico) {
+				$_SESSION["alerta_tipo"] = "erro";
+				$_SESSION["alerta_mensagem"] = "Serviço não encontrado ou já excluído.";
+				header("Location: servicos.php");
+				exit;
+			}
 
 			$stmt = $conexao->prepare("DELETE FROM servicos WHERE id_servico = ?");
 			$stmt->execute([$id]);
+
+			if ($stmt->rowCount() === 0) {
+				$_SESSION["alerta_tipo"] = "erro";
+				$_SESSION["alerta_mensagem"] = "Serviço " . $nomeServico . " não foi excluído. Tente atualizar a página e verificar se ele ainda existe.";
+				header("Location: servicos.php");
+				exit;
+			}
+
 			registrarAuditoria($conexao, "EXCLUSAO", "servicos", $id, "Serviço " . $nomeServico . " excluído do catálogo.");
 
 			$_SESSION["alerta_tipo"] = "exclusao";

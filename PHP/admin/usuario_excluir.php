@@ -7,6 +7,28 @@
 		exit;
 	}
 
+	function excluirDependenciasCliente(PDO $conexao, int $idCliente): void {
+		$stmtOrdens = $conexao->prepare("SELECT id_ordem FROM ordens_servico WHERE id_cliente = ?");
+		$stmtOrdens->execute([$idCliente]);
+		$ordensIds = $stmtOrdens->fetchAll(PDO::FETCH_COLUMN);
+
+		if (!empty($ordensIds)) {
+			$placeholders = implode(",", array_fill(0, count($ordensIds), "?"));
+
+			$stmtDelPag = $conexao->prepare("DELETE FROM pagamentos WHERE id_ordem IN ($placeholders)");
+			$stmtDelPag->execute($ordensIds);
+
+			$stmtDelOss = $conexao->prepare("DELETE FROM ordem_servico_servicos WHERE id_ordem IN ($placeholders)");
+			$stmtDelOss->execute($ordensIds);
+
+			$stmtDelOrdens = $conexao->prepare("DELETE FROM ordens_servico WHERE id_ordem IN ($placeholders)");
+			$stmtDelOrdens->execute($ordensIds);
+		}
+
+		$stmtDelEquip = $conexao->prepare("DELETE FROM equipamentos WHERE id_cliente = ?");
+		$stmtDelEquip->execute([$idCliente]);
+	}
+
 	$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 	$id_tecnico = isset($_GET["id_tecnico"]) ? (int) $_GET["id_tecnico"] : 0;
 	$origem = isset($_GET["origem"]) && $_GET["origem"] === "tecnicos" ? "tecnicos.php" : "usuarios.php";
@@ -18,6 +40,11 @@
 			$stmtTec = $conexao->prepare("SELECT nome, email FROM tecnicos WHERE id_tecnico = ?");
 			$stmtTec->execute([$id_tecnico]);
 			$tec = $stmtTec->fetch();
+
+			if (!$tec) {
+				throw new RuntimeException("Técnico não encontrado ou já excluído.");
+			}
+
 			$nomeTec = $tec["nome"] ?? "Técnico #" . $id_tecnico;
 
 			$stmtUnsetTec = $conexao->prepare("UPDATE ordens_servico SET id_tecnico = NULL WHERE id_tecnico = ?");
@@ -26,16 +53,23 @@
 			$stmtDelTec = $conexao->prepare("DELETE FROM tecnicos WHERE id_tecnico = ?");
 			$stmtDelTec->execute([$id_tecnico]);
 
+			if ($stmtDelTec->rowCount() === 0) {
+				throw new RuntimeException("Técnico não encontrado ou já excluído.");
+			}
+
 			if (!empty($tec["email"])) {
 				$stmtC = $conexao->prepare("SELECT id_cliente FROM clientes WHERE LOWER(email) = ?");
 				$stmtC->execute([strtolower($tec["email"])]);
 				$idCli = (int) ($stmtC->fetchColumn() ?: 0);
 				if ($idCli > 0 && $idCli !== (int) ($sessao["id"] ?? 0)) {
-					$stmtDelEquip = $conexao->prepare("DELETE FROM equipamentos WHERE id_cliente = ?");
-					$stmtDelEquip->execute([$idCli]);
+					excluirDependenciasCliente($conexao, $idCli);
 
 					$stmtDelCli = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
 					$stmtDelCli->execute([$idCli]);
+
+					if ($stmtDelCli->rowCount() === 0) {
+						throw new RuntimeException("Usuário vinculado ao técnico não foi excluído.");
+					}
 				}
 			}
 
@@ -58,33 +92,20 @@
 			$stmtCliente = $conexao->prepare("SELECT nome, email FROM clientes WHERE id_cliente = ?");
 			$stmtCliente->execute([$id]);
 			$clienteInfo = $stmtCliente->fetch();
-			$nomeCliente = $clienteInfo["nome"] ?? "ID " . $id;
 
-			$stmtOrdens = $conexao->prepare("SELECT id_ordem FROM ordens_servico WHERE id_cliente = ?");
-			$stmtOrdens->execute([$id]);
-			$ordensIds = $stmtOrdens->fetchAll(PDO::FETCH_COLUMN);
-
-			if (!empty($ordensIds)) {
-				$placeholders = implode(",", array_fill(0, count($ordensIds), "?"));
-				
-				$stmtDelPag = $conexao->prepare("DELETE FROM pagamentos WHERE id_ordem IN ($placeholders)");
-				$stmtDelPag->execute($ordensIds);
-
-				$stmtDelOss = $conexao->prepare("DELETE FROM ordem_servico_servicos WHERE id_ordem IN ($placeholders)");
-				$stmtDelOss->execute($ordensIds);
-
-				$stmtDelOrdens = $conexao->prepare("DELETE FROM ordens_servico WHERE id_ordem IN ($placeholders)");
-				$stmtDelOrdens->execute($ordensIds);
+			if (!$clienteInfo) {
+				throw new RuntimeException("Usuário não encontrado ou já excluído.");
 			}
 
-			$stmtDelEquip = $conexao->prepare("DELETE FROM equipamentos WHERE id_cliente = ?");
-			$stmtDelEquip->execute([$id]);
+			$nomeCliente = $clienteInfo["nome"] ?? "ID " . $id;
+
+			excluirDependenciasCliente($conexao, $id);
 
 			if (!empty($clienteInfo["email"])) {
-				$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE email = ?");
-				$stmtTec->execute([$clienteInfo["email"]]);
-				$idTec = $stmtTec->fetchColumn();
-				if ($idTec) {
+				$stmtTec = $conexao->prepare("SELECT id_tecnico FROM tecnicos WHERE LOWER(email) = ?");
+				$stmtTec->execute([strtolower($clienteInfo["email"])]);
+				$tecnicosIds = $stmtTec->fetchAll(PDO::FETCH_COLUMN);
+				foreach ($tecnicosIds as $idTec) {
 					$stmtUnsetTec = $conexao->prepare("UPDATE ordens_servico SET id_tecnico = NULL WHERE id_tecnico = ?");
 					$stmtUnsetTec->execute([$idTec]);
 
@@ -95,6 +116,10 @@
 
 			$stmt = $conexao->prepare("DELETE FROM clientes WHERE id_cliente = ?");
 			$stmt->execute([$id]);
+
+			if ($stmt->rowCount() === 0) {
+				throw new RuntimeException("Usuário não encontrado ou já excluído.");
+			}
 
 			registrarAuditoria($conexao, "EXCLUSAO", "clientes", $id, "Gerente excluiu o usuário " . $nomeCliente . ".");
 
